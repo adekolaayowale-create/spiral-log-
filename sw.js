@@ -1,5 +1,5 @@
 // Offline support: tries the network first, falls back to the saved copy.
-const CACHE = 'spiral-log-v3';
+const CACHE = 'spiral-log-v4';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {

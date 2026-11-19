@@ -232,7 +232,9 @@
     display: flex; align-items: center; justify-content: center; padding: 24px;
   }
   .overlay-inner { max-width: 480px; width: 100%; text-align: center; }
-  .name-it-text { font-size: 1.7rem; font-weight: 600; line-height: 1.3; margin: 0 0 32px; }
+  .name-it-lead { font-size: 1.3rem; color: var(--muted); margin: 0 0 14px; }
+  .name-it-text { font-size: 1.6rem; font-weight: 600; line-height: 1.3; margin: 0 0 14px; }
+  .name-it-end { margin-top: 32px; }
   .breath-wrap { height: 240px; display: flex; align-items: center; justify-content: center; }
   .breath { width: 200px; height: 200px; border-radius: 50%; background: var(--accent); opacity: .75; transform: scale(.5); transition-property: transform; transition-timing-function: ease-in-out; }
   .breath-label { font-size: 1.4rem; font-weight: 600; margin: 10px 0 28px; min-height: 2em; }
@@ -294,7 +296,7 @@
 
     <!-- Timer: setup -->
     <div class="card" id="timerSetup">
-      <h2>Urge to ruminate?</h2>
+      <h2>Urge to do a compulsion?</h2>
       <p class="note" style="margin-top:0">Commit to waiting before you do anything. Urges usually rise, peak and fade, and the timer lets you watch that happen.</p>
       <span class="field">Wait for</span>
       <div class="chips" id="durChips" role="radiogroup" aria-label="Timer length">
@@ -355,6 +357,7 @@
     <div class="card">
       <h2>Name it</h2>
       <button class="btn primary big" type="button" data-action="name-it">This is an OCD thought</button>
+      <button class="btn link" type="button" data-action="edit-words" style="margin-top:8px">Change what it says</button>
     </div>
 
     <div class="card">
@@ -494,6 +497,16 @@
       </div>
     </div>
 
+    <div class="card" id="wordsCard">
+      <h2>Name it: your words</h2>
+      <p class="note" style="margin-top:0">Finish the sentence <strong>"This is an OCD thought, …"</strong> in your own words. Everything you add shows each time you tap Name it. Keep it short.</p>
+      <div id="endingsList"></div>
+      <div class="add-tag">
+        <input type="text" id="newEnding" maxlength="80" placeholder="e.g. I don't have to give it strength." aria-label="Finish the sentence">
+        <button class="btn" id="addEnding" type="button">Add</button>
+      </div>
+    </div>
+
     <div class="card">
       <h2>Trigger tags</h2>
       <div id="trigManage"></div>
@@ -551,7 +564,8 @@
   'use strict';
 
   // ================= Settings you can change =================
-  const NAME_IT_TEXT = 'This is an OCD thought, not a fact.';
+  const NAME_IT_START = 'This is an OCD thought,';
+  const DEFAULT_ENDINGS = ['not a fact.'];
   const DEFAULT_TAGS = ['Walk', 'Talked to someone', 'Delayed the compulsion', 'Sleep', 'Music'];
   const DEFAULT_TRIGGERS = ['Contamination', 'Checking', 'Harm thoughts', 'Work stress', 'Poor sleep', 'Social'];
   const FOLLOW_UP_MIN = 20;      // ask for the "later" rating after this many minutes
@@ -561,7 +575,7 @@
   const STORE_KEY = 'spiralLog.v1';
 
   function blankState() {
-    return { entries: [], urges: [], ladder: [], nameIt: [], tags: DEFAULT_TAGS.slice(), triggerTags: DEFAULT_TRIGGERS.slice(), review: {}, activeTimer: null };
+    return { entries: [], urges: [], ladder: [], nameIt: [], nameItEndings: DEFAULT_ENDINGS.slice(), tags: DEFAULT_TAGS.slice(), triggerTags: DEFAULT_TRIGGERS.slice(), review: {}, activeTimer: null };
   }
   function load() {
     const s = blankState();
@@ -569,7 +583,7 @@
       const raw = localStorage.getItem(STORE_KEY);
       if (raw) {
         const d = JSON.parse(raw);
-        ['entries', 'urges', 'ladder', 'nameIt', 'tags', 'triggerTags'].forEach((k) => { if (Array.isArray(d[k])) s[k] = d[k]; });
+        ['entries', 'urges', 'ladder', 'nameIt', 'nameItEndings', 'tags', 'triggerTags'].forEach((k) => { if (Array.isArray(d[k])) s[k] = d[k]; });
         if (d.review && typeof d.review === 'object') s.review = d.review;
         if (d.activeTimer && typeof d.activeTimer === 'object') s.activeTimer = d.activeTimer;
       }
@@ -708,7 +722,12 @@
   function nameIt() {
     state.nameIt.push(Date.now());
     save();
-    openOverlay('<p class="name-it-text">' + esc(NAME_IT_TEXT) + '</p><button class="btn primary" type="button" data-action="close">Close</button>');
+    const ends = state.nameItEndings || [];
+    const body = ends.length
+      ? '<p class="name-it-lead">' + esc(NAME_IT_START) + '</p>' + ends.map((e) => '<p class="name-it-text">' + esc(e) + '</p>').join('')
+      : '<p class="name-it-text">' + esc(NAME_IT_START.replace(/,$/, '.')) + '</p>';
+    openOverlay(body + '<div class="name-it-end"><button class="btn primary" type="button" data-action="close">Close</button>' +
+      '<p><button class="btn link" type="button" data-action="edit-words">Change my words</button></p></div>');
   }
 
   function breathe() {
@@ -761,6 +780,7 @@
     else if (a === 'ground') ground(0);
     else if (a === 'ground-next') ground(Number(b.dataset.step));
     else if (a === 'close') closeOverlay();
+    else if (a === 'edit-words') { closeOverlay(); show('settings'); $('wordsCard').scrollIntoView(); $('newEnding').focus(); }
   });
 
   // ================= Delay timer =================
@@ -1366,6 +1386,7 @@
       : '<p class="note" style="margin:0">' + emptyMsg + '</p>';
   }
   function renderSettings() {
+    manageList('endingsList', 'nameItEndings', 'Nothing added. Name it will just say "This is an OCD thought."');
     manageList('trigManage', 'triggerTags', 'No trigger tags. Add some from the Log screen.');
     manageList('tagManage', 'tags', 'No tags. Add some from the Log screen.');
   }
@@ -1375,6 +1396,15 @@
     state[key].splice(Number(i), 1);
     save(); renderSettings(); helpedChips.render(); trigChips.render(); timerTrigChips.render();
   });
+
+  function addEnding() {
+    let t = $('newEnding').value.trim().replace(/\s+/g, ' ');
+    if (!t) return;
+    if (!state.nameItEndings.some((x) => x.toLowerCase() === t.toLowerCase())) state.nameItEndings.push(t);
+    save(); $('newEnding').value = ''; renderSettings(); toast('Added');
+  }
+  $('addEnding').addEventListener('click', addEnding);
+  $('newEnding').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addEnding(); } });
 
   $('exportBtn').addEventListener('click', () => {
     const payload = Object.assign({ app: 'spiral-log', version: 2, exportedAt: new Date().toISOString() }, state, { activeTimer: null });
@@ -1407,7 +1437,7 @@
         mergeById('urges', (u) => /^\d{4}-\d{2}-\d{2}$/.test(u.date) && isNum(u.before));
         mergeById('ladder', (s) => typeof s.text === 'string' && isNum(s.predicted));
         if (Array.isArray(d.nameIt)) { const have = new Set(state.nameIt); d.nameIt.forEach((t) => { if (isNum(t) && !have.has(t)) state.nameIt.push(t); }); }
-        ['tags', 'triggerTags'].forEach((key) => {
+        ['tags', 'triggerTags', 'nameItEndings'].forEach((key) => {
           if (Array.isArray(d[key])) d[key].forEach((t) => {
             if (typeof t === 'string' && !state[key].some((x) => x.toLowerCase() === t.toLowerCase())) state[key].push(t);
           });
