@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f1ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Spiral Log">
+<title>Spiral Log</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  :root {
+    --bg: #f4f1ec;
+    --card: #ffffff;
+    --ink: #2f3a3a;
+    --muted: #6b7676;
+    --line: #e3ddd4;
+    --accent: #5b8a83;
+    --accent-ink: #ffffff;
+    --chip: #efebe4;
+    --danger: #a5574f;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c2222;
+      --card: #252d2d;
+      --ink: #e6ebea;
+      --muted: #9aa6a5;
+      --line: #364040;
+      --accent: #7fb0a8;
+      --accent-ink: #13201e;
+      --chip: #2f3838;
+      --danger: #d48b83;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.45;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+  header {
+    padding: calc(18px + env(safe-area-inset-top)) 20px 6px;
+    max-width: 640px; margin: 0 auto;
+  }
+  header h1 { font-size: 1.35rem; margin: 0; font-weight: 600; letter-spacing: -0.01em; }
+  header p { margin: 2px 0 0; color: var(--muted); font-size: 0.9rem; }
+  main { max-width: 640px; margin: 0 auto; padding: 8px 16px 24px; }
+  .view { display: none; }
+  .view.active { display: block; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  h2 { font-size: 1.05rem; margin: 0 0 10px; font-weight: 600; }
+  label.field { display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 6px; }
+  .hint { color: var(--muted); font-size: 0.85rem; font-weight: 400; }
+  input[type="date"], input[type="text"], textarea {
+    width: 100%;
+    font: inherit;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  textarea { min-height: 70px; resize: vertical; }
+  input:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  /* Slider */
+  .distress-head { display: flex; justify-content: space-between; align-items: baseline; }
+  .distress-value { font-size: 1.6rem; font-weight: 700; min-width: 2ch; text-align: right; }
+  .distress-word { color: var(--muted); font-size: 0.9rem; }
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 36px; background: transparent; margin: 4px 0 0;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 10px; border-radius: 6px;
+    background: linear-gradient(90deg, hsl(150 40% 72%), hsl(45 60% 75%), hsl(10 50% 72%));
+  }
+  input[type="range"]::-moz-range-track {
+    height: 10px; border-radius: 6px;
+    background: linear-gradient(90deg, hsl(150 40% 72%), hsl(45 60% 75%), hsl(10 50% 72%));
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--card); border: 3px solid var(--accent);
+    margin-top: -10px; box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--card); border: 3px solid var(--accent);
+  }
+  .scale-ends { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.8rem; }
+
+  /* Chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font: inherit; font-size: 0.92rem;
+    border: 1px solid var(--line);
+    background: var(--chip); color: var(--ink);
+    padding: 8px 14px; border-radius: 999px; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .chip.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .add-tag { display: flex; gap: 8px; margin-top: 10px; }
+  .add-tag input { flex: 1; }
+
+  /* Buttons */
+  .btn {
+    font: inherit; font-weight: 600;
+    border: 1px solid var(--line); background: var(--chip); color: var(--ink);
+    padding: 10px 16px; border-radius: 10px; cursor: pointer;
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); width: 100%; padding: 14px; font-size: 1.05rem; }
+  .btn.small { padding: 6px 12px; font-size: 0.85rem; font-weight: 500; }
+  .btn.danger { color: var(--danger); }
+  .btn.link { background: none; border: none; color: var(--accent); padding: 4px 0; font-weight: 500; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .editing-banner { display: none; justify-content: space-between; align-items: center; background: var(--chip); border-radius: 10px; padding: 8px 12px; margin-bottom: 12px; font-size: 0.9rem; }
+  .editing-banner.show { display: flex; }
+
+  /* Calendar */
+  .cal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .cal-head .btn { padding: 6px 14px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal-dow { text-align: center; font-size: 0.75rem; color: var(--muted); padding-bottom: 2px; }
+  .cal-day {
+    aspect-ratio: 1 / 1; border-radius: 8px; border: 1px solid transparent;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 0.85rem; cursor: pointer; background: none; color: var(--ink); font-family: inherit; padding: 0;
+  }
+  .cal-day.empty { cursor: default; }
+  .cal-day.has { color: #2f3a3a; }
+  .cal-day .avg { font-size: 0.7rem; opacity: 0.8; }
+  .cal-day.today { border-color: var(--accent); }
+  .cal-day.selected { outline: 2px solid var(--ink); outline-offset: -2px; }
+  .legend { display: flex; gap: 10px; align-items: center; margin-top: 10px; font-size: 0.78rem; color: var(--muted); flex-wrap: wrap; }
+  .legend span.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 4px; }
+
+  /* Entries */
+  .entry { border-top: 1px solid var(--line); padding: 12px 0; }
+  .entry:first-child { border-top: none; padding-top: 0; }
+  .entry-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .entry-date { font-weight: 600; }
+  .badge { font-weight: 700; color: #2f3a3a; border-radius: 8px; padding: 2px 10px; font-size: 0.9rem; }
+  .pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .pill { background: var(--chip); border-radius: 999px; padding: 3px 10px; font-size: 0.8rem; }
+  .entry p { margin: 8px 0 0; white-space: pre-wrap; }
+  .entry .trigger { color: var(--muted); font-size: 0.9rem; }
+  .entry .actions { margin-top: 8px; display: flex; gap: 8px; }
+  .empty-msg { color: var(--muted); text-align: center; padding: 10px 0; }
+
+  /* Patterns */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stat { background: var(--chip); border-radius: 10px; padding: 10px; text-align: center; }
+  .stat .num { font-size: 1.4rem; font-weight: 700; }
+  .stat .lbl { font-size: 0.75rem; color: var(--muted); }
+  .tag-row { padding: 10px 0; border-top: 1px solid var(--line); }
+  .tag-row:first-of-type { border-top: none; }
+  .tag-row-top { display: flex; justify-content: space-between; gap: 8px; }
+  .tag-name { font-weight: 600; }
+  .tag-meta { color: var(--muted); font-size: 0.85rem; }
+  .bars { margin-top: 6px; display: grid; grid-template-columns: auto 1fr auto; gap: 4px 8px; align-items: center; font-size: 0.8rem; color: var(--muted); }
+  .bar { height: 8px; border-radius: 4px; background: var(--chip); overflow: hidden; }
+  .bar > div { height: 100%; border-radius: 4px; }
+  .note { font-size: 0.85rem; color: var(--muted); }
+
+  /* Settings */
+  .tag-manage { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
+  .tag-manage:first-child { border-top: none; }
+
+  /* Bottom nav */
+  nav.tabs {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    background: var(--card); border-top: 1px solid var(--line);
+    display: flex; justify-content: center;
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 10;
+  }
+  nav.tabs .inner { display: flex; width: 100%; max-width: 640px; }
+  nav.tabs button {
+    flex: 1; font: inherit; font-size: 0.8rem; background: none; border: none; color: var(--muted);
+    padding: 10px 4px 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+  nav.tabs button .ico { display: block; }
+  nav.tabs button.active { color: var(--accent); font-weight: 600; }
+
+  #toast {
+    position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 999px; font-size: 0.9rem;
+    opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 20;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Spiral Log</h1>
+  <p>Notice what helps.</p>
+</header>
+
+<main>
+  <!-- LOG -->
+  <section id="view-log" class="view active" aria-label="Log an entry">
+    <div class="editing-banner" id="editingBanner">
+      <span>Editing an earlier entry</span>
+      <button class="btn small" id="cancelEdit" type="button">Cancel</button>
+    </div>
+
+    <div class="card">
+      <label class="field" for="date">Date</label>
+      <input type="date" id="date">
+    </div>
+
+    <div class="card">
+      <div class="distress-head">
+        <label class="field" for="distress">How intense was it?</label>
+        <span class="distress-value" id="distressValue">5</span>
+      </div>
+      <input type="range" id="distress" min="0" max="10" step="1" value="5" aria-describedby="distressWord">
+      <div class="scale-ends"><span>0 calm</span><span class="distress-word" id="distressWord">Anxious</span><span>10 overwhelming</span></div>
+    </div>
+
+    <div class="card">
+      <label class="field" for="feeling">How I feel <span class="hint">(optional)</span></label>
+      <textarea id="feeling" placeholder="A few words is enough"></textarea>
+    </div>
+
+    <div class="card">
+      <span class="field">What helped today</span>
+      <div class="chips" id="tagChips"></div>
+      <div class="add-tag">
+        <input type="text" id="newTag" placeholder="Add your own" maxlength="40" aria-label="New tag name">
+        <button class="btn" id="addTagBtn" type="button">Add</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="field" for="trigger">What set it off <span class="hint">(optional)</span></label>
+      <input type="text" id="trigger" placeholder="e.g. work email, intrusive thought" maxlength="120">
+    </div>
+
+    <button class="btn primary" id="saveBtn" type="button">Save entry</button>
+  </section>
+
+  <!-- HISTORY -->
+  <section id="view-history" class="view" aria-label="History">
+    <div class="card">
+      <div class="cal-head">
+        <button class="btn" id="prevMonth" type="button" aria-label="Previous month">‹</button>
+        <h2 id="monthLabel" style="margin:0"></h2>
+        <button class="btn" id="nextMonth" type="button" aria-label="Next month">›</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="legend">
+        <span><span class="sw" id="lgLow"></span>0–3</span>
+        <span><span class="sw" id="lgMid"></span>4–6</span>
+        <span><span class="sw" id="lgHigh"></span>7–10</span>
+        <span>Number = average for that day</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h2 id="listTitle" style="margin:0 0 10px">All entries</h2>
+        <button class="btn link" id="showAll" type="button" style="display:none">Show all</button>
+      </div>
+      <div id="entryList"></div>
+    </div>
+  </section>
+
+  <!-- PATTERNS -->
+  <section id="view-patterns" class="view" aria-label="Patterns">
+    <div id="patternsBody"></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="view-settings" class="view" aria-label="Settings">
+    <div class="card">
+      <h2>Your data</h2>
+      <p class="note" style="margin-top:0">Everything is stored only in this browser on this device. Nothing is sent anywhere. Export a backup now and then, especially before clearing your browser data.</p>
+      <div class="row">
+        <button class="btn" id="exportBtn" type="button">Export backup</button>
+        <button class="btn" id="importBtn" type="button">Import backup</button>
+        <input type="file" id="importFile" accept="application/json,.json" class="sr-only">
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>"What helped" tags</h2>
+      <div id="tagManage"></div>
+      <p class="note">Removing a tag hides it from the log screen. Past entries keep it.</p>
+    </div>
+
+    <div class="card">
+      <h2>Start over</h2>
+      <p class="note" style="margin-top:0">Deletes every entry from this device. This can't be undone, so export first if you want a copy.</p>
+      <button class="btn danger" id="wipeBtn" type="button">Delete all data</button>
+    </div>
+  </section>
+</main>
+
+<nav class="tabs" aria-label="Sections">
+  <div class="inner">
+    <button type="button" data-view="log" class="active"><svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg>Log</button>
+    <button type="button" data-view="history"><svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>History</button>
+    <button type="button" data-view="patterns"><svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Review</button>
+    <button type="button" data-view="settings"><svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Settings</button>
+  </div>
+</nav>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------- Storage ----------
+  const STORE_KEY = 'spiralLog.v1';
+  const DEFAULT_TAGS = ['Walk', 'Talked to someone', 'Delayed the compulsion', 'Sleep', 'Music'];
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (raw) {
+        const d = JSON.parse(raw);
+        return {
+          entries: Array.isArray(d.entries) ? d.entries : [],
+          tags: Array.isArray(d.tags) ? d.tags : DEFAULT_TAGS.slice(),
+          review: d.review && typeof d.review === 'object' ? d.review : {}
+        };
+      }
+    } catch (e) { /* fall through to defaults */ }
+    return { entries: [], tags: DEFAULT_TAGS.slice(), review: {} };
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(state));
+      return true;
+    } catch (e) {
+      toast('Could not save on this device');
+      return false;
+    }
+  }
+
+  let state = load();
+
+  // ---------- Helpers ----------
+  const $ = (id) => document.getElementById(id);
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function dateKey(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function todayKey() { return dateKey(new Date()); }
+  function parseKey(k) { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); }
+  function prettyDate(k) {
+    return parseKey(k).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function avg(arr) { return arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null; }
+  function fmt1(n) { return n === null ? '–' : (Math.round(n * 10) / 10).toString(); }
+
+  function distressColor(v) {
+    const h = 150 - (Math.max(0, Math.min(10, v)) / 10) * 140; // green -> red
+    return 'hsl(' + h + ' 55% 80%)';
+  }
+  function distressWord(v) {
+    if (v <= 2) return 'Calm';
+    if (v <= 4) return 'Uneasy';
+    if (v <= 6) return 'Anxious';
+    if (v <= 8) return 'Very distressed';
+    return 'Overwhelming';
+  }
+
+  let toastTimer;
+  function toast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  function sortedEntries() {
+    return state.entries.slice().sort((a, b) =>
+      a.date === b.date ? (b.createdAt || 0) - (a.createdAt || 0) : (a.date < b.date ? 1 : -1));
+  }
+
+  // ---------- Navigation ----------
+  const views = ['log', 'history', 'patterns', 'settings'];
+  function show(view) {
+    views.forEach((v) => $('view-' + v).classList.toggle('active', v === view));
+    document.querySelectorAll('nav.tabs button').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
+    if (view === 'history') renderHistory();
+    if (view === 'patterns') renderPatterns();
+    if (view === 'settings') renderTagManage();
+    window.scrollTo(0, 0);
+  }
+  document.querySelectorAll('nav.tabs button').forEach((b) => b.addEventListener('click', () => show(b.dataset.view)));
+
+  // ---------- Log form ----------
+  let selectedTags = new Set();
+  let editingId = null;
+
+  function updateDistressDisplay() {
+    const v = Number($('distress').value);
+    $('distressValue').textContent = v;
+    $('distressWord').textContent = distressWord(v);
+  }
+  $('distress').addEventListener('input', updateDistressDisplay);
+
+  function renderTagChips() {
+    // Show active tags, plus any tag selected on the entry being edited (even if since removed)
+    const list = state.tags.slice();
+    selectedTags.forEach((t) => { if (!list.includes(t)) list.push(t); });
+    $('tagChips').innerHTML = list.map((t) =>
+      '<button type="button" class="chip' + (selectedTags.has(t) ? ' on' : '') + '" aria-pressed="' + selectedTags.has(t) + '" data-tag="' + esc(t) + '">' + esc(t) + '</button>'
+    ).join('');
+  }
+  $('tagChips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    const t = chip.dataset.tag;
+    if (selectedTags.has(t)) selectedTags.delete(t); else selectedTags.add(t);
+    renderTagChips();
+  });
+
+  function addTag() {
+    const name = $('newTag').value.trim().replace(/\s+/g, ' ');
+    if (!name) return;
+    const existing = state.tags.find((t) => t.toLowerCase() === name.toLowerCase());
+    const tag = existing || name;
+    if (!existing) state.tags.push(tag);
+    selectedTags.add(tag);
+    save();
+    $('newTag').value = '';
+    renderTagChips();
+  }
+  $('addTagBtn').addEventListener('click', addTag);
+  $('newTag').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } });
+
+  function resetForm() {
+    editingId = null;
+    selectedTags = new Set();
+    $('date').value = todayKey();
+    $('distress').value = 5;
+    $('feeling').value = '';
+    $('trigger').value = '';
+    $('editingBanner').classList.remove('show');
+    $('saveBtn').textContent = 'Save entry';
+    updateDistressDisplay();
+    renderTagChips();
+  }
+
+  function startEdit(id) {
+    const e = state.entries.find((x) => x.id === id);
+    if (!e) return;
+    editingId = id;
+    selectedTags = new Set(e.tags || []);
+    $('date').value = e.date;
+    $('distress').value = e.distress;
+    $('feeling').value = e.feeling || '';
+    $('trigger').value = e.trigger || '';
+    $('editingBanner').classList.add('show');
+    $('saveBtn').textContent = 'Save changes';
+    updateDistressDisplay();
+    renderTagChips();
+    show('log');
+  }
+  $('cancelEdit').addEventListener('click', resetForm);
+
+  $('saveBtn').addEventListener('click', () => {
+    const date = $('date').value;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { toast('Please pick a date'); return; }
+    const data = {
+      date: date,
+      distress: Number($('distress').value),
+      feeling: $('feeling').value.trim(),
+      tags: Array.from(selectedTags),
+      trigger: $('trigger').value.trim()
+    };
+    if (editingId) {
+      const i = state.entries.findIndex((x) => x.id === editingId);
+      if (i >= 0) state.entries[i] = Object.assign({}, state.entries[i], data, { updatedAt: Date.now() });
+    } else {
+      state.entries.push(Object.assign({ id: uid(), createdAt: Date.now() }, data));
+    }
+    if (save()) {
+      toast(editingId ? 'Changes saved' : 'Saved');
+      resetForm();
+    }
+  });
+
+  // ---------- History ----------
+  let calMonth = (() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); })();
+  let selectedDay = null;
+
+  function entriesByDay() {
+    const map = {};
+    state.entries.forEach((e) => { (map[e.date] = map[e.date] || []).push(e); });
+    return map;
+  }
+
+  function renderCalendar() {
+    const byDay = entriesByDay();
+    $('monthLabel').textContent = calMonth.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+    const dows = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    let html = dows.map((d) => '<div class="cal-dow">' + d + '</div>').join('');
+    const first = calMonth;
+    const offset = (first.getDay() + 6) % 7; // Monday-first
+    const daysInMonth = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+    for (let i = 0; i < offset; i++) html += '<div class="cal-day empty"></div>';
+    const today = todayKey();
+    for (let d = 1; d <= daysInMonth; d++) {
+      const key = dateKey(new Date(first.getFullYear(), first.getMonth(), d));
+      const list = byDay[key];
+      const classes = ['cal-day'];
+      let style = '';
+      let inner = '<span>' + d + '</span>';
+      let label = prettyDate(key);
+      if (list) {
+        const a = avg(list.map((e) => e.distress));
+        classes.push('has');
+        style = ' style="background:' + distressColor(a) + '"';
+        inner += '<span class="avg">' + fmt1(a) + '</span>';
+        label += ', average ' + fmt1(a) + ', ' + list.length + (list.length === 1 ? ' entry' : ' entries');
+      }
+      if (key === today) classes.push('today');
+      if (key === selectedDay) classes.push('selected');
+      html += '<button type="button" class="' + classes.join(' ') + '"' + style + ' data-day="' + key + '" aria-label="' + esc(label) + '">' + inner + '</button>';
+    }
+    $('calGrid').innerHTML = html;
+    $('lgLow').style.background = distressColor(1.5);
+    $('lgMid').style.background = distressColor(5);
+    $('lgHigh').style.background = distressColor(8.5);
+  }
+
+  $('calGrid').addEventListener('click', (e) => {
+    const b = e.target.closest('.cal-day[data-day]');
+    if (!b) return;
+    selectedDay = selectedDay === b.dataset.day ? null : b.dataset.day;
+    renderHistory();
+  });
+  $('prevMonth').addEventListener('click', () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() - 1, 1); renderCalendar(); });
+  $('nextMonth').addEventListener('click', () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 1); renderCalendar(); });
+  $('showAll').addEventListener('click', () => { selectedDay = null; renderHistory(); });
+
+  function entryHTML(e) {
+    const tags = (e.tags || []).map((t) => '<span class="pill">' + esc(t) + '</span>').join('');
+    return '<div class="entry">' +
+      '<div class="entry-top"><span class="entry-date">' + esc(prettyDate(e.date)) + '</span>' +
+      '<span class="badge" style="background:' + distressColor(e.distress) + '" title="Distress">' + e.distress + '/10</span></div>' +
+      (tags ? '<div class="pills">' + tags + '</div>' : '') +
+      (e.feeling ? '<p>' + esc(e.feeling) + '</p>' : '') +
+      (e.trigger ? '<p class="trigger">Trigger: ' + esc(e.trigger) + '</p>' : '') +
+      '<div class="actions"><button type="button" class="btn small" data-edit="' + e.id + '">Edit</button>' +
+      '<button type="button" class="btn small danger" data-del="' + e.id + '">Delete</button></div>' +
+      '</div>';
+  }
+
+  function renderHistory() {
+    renderCalendar();
+    let list = sortedEntries();
+    if (selectedDay) list = list.filter((e) => e.date === selectedDay);
+    $('listTitle').textContent = selectedDay ? prettyDate(selectedDay) : 'All entries';
+    $('showAll').style.display = selectedDay ? 'inline-block' : 'none';
+    $('entryList').innerHTML = list.length
+      ? list.map(entryHTML).join('')
+      : '<div class="empty-msg">' + (selectedDay ? 'No entries on this day.' : 'No entries yet. Your first one will show up here.') + '</div>';
+  }
+
+  $('entryList').addEventListener('click', (e) => {
+    const ed = e.target.closest('[data-edit]');
+    const del = e.target.closest('[data-del]');
+    if (ed) startEdit(ed.dataset.edit);
+    if (del && confirm('Delete this entry? This can\'t be undone.')) {
+      state.entries = state.entries.filter((x) => x.id !== del.dataset.del);
+      if (editingId === del.dataset.del) resetForm();
+      save();
+      renderHistory();
+      toast('Entry deleted');
+    }
+  });
+
+  // ---------- Patterns ----------
+  // Patterns open once per calendar month. Once opened, they stay open for the
+  // rest of that day, then lock until the 1st of the next month.
+  function reviewStatus() {
+    const today = todayKey();
+    const last = (state.review && state.review.lastOpened) || '';
+    if (last === today) return 'open';
+    if (last && last.slice(0, 7) === today.slice(0, 7)) return 'locked';
+    return 'ready';
+  }
+  function nextMonthLabel() {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth() + 1, 1)
+      .toLocaleDateString(undefined, { day: 'numeric', month: 'long' });
+  }
+
+  function renderPatterns() {
+    const body = $('patternsBody');
+    // Don't use up the monthly review before there's anything to see
+    if (state.entries.length < 3 && reviewStatus() !== 'open') {
+      body.innerHTML = '<div class="card"><h2>Monthly review</h2><p class="note" style="margin:0">Patterns start to show after a few entries. You have ' +
+        state.entries.length + ' so far. Keep logging, and your review will be here when there\'s enough to look at.</p></div>';
+      return;
+    }
+    const status = reviewStatus();
+    if (status === 'locked') {
+      body.innerHTML = '<div class="card"><h2>Monthly review</h2><p class="note" style="margin:0">You\'ve had this month\'s review. ' +
+        'Your next one opens on <strong>' + esc(nextMonthLabel()) + '</strong>.</p>' +
+        '<p class="note">Until then, just keep logging. Looking at patterns less often gives them time to show and keeps the focus on living, not checking.</p></div>';
+      return;
+    }
+    if (status === 'ready') {
+      body.innerHTML = '<div class="card"><h2>Your monthly review is ready</h2><p class="note" style="margin-top:0">You can open patterns once a month. ' +
+        'Once opened, they stay available for the rest of today, then close until ' + esc(nextMonthLabel()) + '.</p>' +
+        '<p class="note">Pick a moment when you have a few calm minutes.</p>' +
+        '<button class="btn primary" id="openReview" type="button">Open this month\'s review</button></div>';
+      $('openReview').addEventListener('click', () => {
+        state.review = Object.assign({}, state.review, { lastOpened: todayKey() });
+        save();
+        renderPatterns();
+      });
+      return;
+    }
+    const entries = state.entries;
+    if (entries.length < 3) {
+      body.innerHTML = '<div class="card"><h2>Patterns</h2><p class="note" style="margin:0">Patterns start to show after a few entries. You have ' +
+        entries.length + ' so far. Keep logging and come back next month.</p></div>';
+      return;
+    }
+
+    // Last 30 days vs the 30 days before
+    const now = new Date(); now.setHours(0, 0, 0, 0);
+    const daysAgo = (k) => Math.round((now - parseKey(k)) / 86400000);
+    const last7 = entries.filter((e) => { const d = daysAgo(e.date); return d >= 0 && d < 30; }).map((e) => e.distress);
+    const prev7 = entries.filter((e) => { const d = daysAgo(e.date); return d >= 30 && d < 60; }).map((e) => e.distress);
+    const a7 = avg(last7), p7 = avg(prev7);
+
+    let html = '<div class="card"><h2>Overview</h2><p class="note" style="margin-top:0">Open until the end of today. Next review: ' + esc(nextMonthLabel()) + '.</p><div class="stats">' +
+      '<div class="stat"><div class="num">' + entries.length + '</div><div class="lbl">entries</div></div>' +
+      '<div class="stat"><div class="num">' + fmt1(a7) + '</div><div class="lbl">avg, last 30 days</div></div>' +
+      '<div class="stat"><div class="num">' + fmt1(p7) + '</div><div class="lbl">avg, 30 days before</div></div>' +
+      '</div></div>';
+
+    // Per tag
+    const allTags = new Set();
+    entries.forEach((e) => (e.tags || []).forEach((t) => allTags.add(t)));
+    const rows = Array.from(allTags).map((t) => {
+      const withT = entries.filter((e) => (e.tags || []).includes(t)).map((e) => e.distress);
+      const without = entries.filter((e) => !(e.tags || []).includes(t)).map((e) => e.distress);
+      return { tag: t, count: withT.length, withAvg: avg(withT), withoutAvg: avg(without) };
+    }).sort((a, b) => b.count - a.count);
+
+    html += '<div class="card"><h2>What helped</h2>';
+    if (!rows.length) {
+      html += '<p class="note" style="margin:0">No "what helped" tags logged yet.</p>';
+    } else {
+      rows.forEach((r) => {
+        const diff = (r.withAvg !== null && r.withoutAvg !== null) ? r.withAvg - r.withoutAvg : null;
+        let diffText = '';
+        if (diff !== null && r.count >= 2) {
+          if (Math.abs(diff) < 0.5) diffText = 'about the same as other entries';
+          else diffText = fmt1(Math.abs(diff)) + (diff < 0 ? ' lower' : ' higher') + ' than entries without it';
+        }
+        html += '<div class="tag-row"><div class="tag-row-top"><span class="tag-name">' + esc(r.tag) + '</span>' +
+          '<span class="tag-meta">used ' + r.count + (r.count === 1 ? ' time' : ' times') + '</span></div>' +
+          '<div class="bars">' +
+            '<span>with</span><div class="bar"><div style="width:' + ((r.withAvg || 0) * 10) + '%;background:' + distressColor(r.withAvg || 0) + '"></div></div><span>' + fmt1(r.withAvg) + '</span>' +
+            '<span>without</span><div class="bar"><div style="width:' + ((r.withoutAvg || 0) * 10) + '%;background:' + distressColor(r.withoutAvg || 0) + '"></div></div><span>' + fmt1(r.withoutAvg) + '</span>' +
+          '</div>' +
+          (diffText ? '<div class="tag-meta" style="margin-top:4px">Average distress ' + diffText + '</div>' : '') +
+          '</div>';
+      });
+      html += '<p class="note">These show what tends to go together, not what causes what. Something you reach for on hard days can look "higher" simply because you use it when things are hard. How often you use it matters too.</p>';
+    }
+    html += '</div>';
+
+    // Triggers
+    const trig = {};
+    entries.forEach((e) => {
+      if (!e.trigger) return;
+      const k = e.trigger.trim().toLowerCase();
+      if (!trig[k]) trig[k] = { label: e.trigger.trim(), n: 0, d: [] };
+      trig[k].n++; trig[k].d.push(e.distress);
+    });
+    const trigRows = Object.values(trig).sort((a, b) => b.n - a.n).slice(0, 6);
+    if (trigRows.length) {
+      html += '<div class="card"><h2>Common triggers</h2>';
+      trigRows.forEach((t) => {
+        html += '<div class="tag-row"><div class="tag-row-top"><span class="tag-name">' + esc(t.label) + '</span>' +
+          '<span class="tag-meta">' + t.n + '× · avg ' + fmt1(avg(t.d)) + '</span></div></div>';
+      });
+      html += '</div>';
+    }
+
+    body.innerHTML = html;
+  }
+
+  // ---------- Settings ----------
+  function renderTagManage() {
+    $('tagManage').innerHTML = state.tags.length
+      ? state.tags.map((t, i) =>
+          '<div class="tag-manage"><span>' + esc(t) + '</span><button type="button" class="btn small danger" data-rm="' + i + '">Remove</button></div>'
+        ).join('')
+      : '<p class="note" style="margin:0">No tags. Add some from the Log screen.</p>';
+  }
+  $('tagManage').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-rm]');
+    if (!b) return;
+    const t = state.tags[Number(b.dataset.rm)];
+    state.tags.splice(Number(b.dataset.rm), 1);
+    selectedTags.delete(t);
+    save();
+    renderTagManage();
+    renderTagChips();
+  });
+
+  $('exportBtn').addEventListener('click', () => {
+    const payload = { app: 'spiral-log', version: 1, exportedAt: new Date().toISOString(), entries: state.entries, tags: state.tags };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'spiral-log-backup-' + todayKey() + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast('Backup downloaded');
+  });
+
+  $('importBtn').addEventListener('click', () => $('importFile').click());
+  $('importFile').addEventListener('change', (ev) => {
+    const file = ev.target.files && ev.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const d = JSON.parse(reader.result);
+        const incoming = Array.isArray(d.entries) ? d.entries : [];
+        const valid = incoming.filter((e) => e && /^\d{4}-\d{2}-\d{2}$/.test(e.date) && typeof e.distress === 'number');
+        const have = new Set(state.entries.map((e) => e.id));
+        let added = 0;
+        valid.forEach((e) => {
+          const clean = {
+            id: e.id && !have.has(e.id) ? String(e.id) : uid(),
+            createdAt: Number(e.createdAt) || Date.now(),
+            date: e.date,
+            distress: Math.max(0, Math.min(10, Math.round(e.distress))),
+            feeling: typeof e.feeling === 'string' ? e.feeling : '',
+            tags: Array.isArray(e.tags) ? e.tags.filter((t) => typeof t === 'string') : [],
+            trigger: typeof e.trigger === 'string' ? e.trigger : ''
+          };
+          if (e.id && have.has(e.id)) return; // already have it
+          state.entries.push(clean);
+          have.add(clean.id);
+          added++;
+        });
+        if (Array.isArray(d.tags)) {
+          d.tags.forEach((t) => {
+            if (typeof t === 'string' && !state.tags.some((x) => x.toLowerCase() === t.toLowerCase())) state.tags.push(t);
+          });
+        }
+        save();
+        renderTagManage();
+        renderTagChips();
+        toast(added ? 'Imported ' + added + (added === 1 ? ' entry' : ' entries') : 'Nothing new to import');
+      } catch (err) {
+        toast('That file couldn\'t be read');
+      }
+      ev.target.value = '';
+    };
+    reader.readAsText(file);
+  });
+
+  $('wipeBtn').addEventListener('click', () => {
+    if (!confirm('Delete ALL entries from this device? This can\'t be undone.')) return;
+    state = { entries: [], tags: DEFAULT_TAGS.slice(), review: state.review || {} };
+    save();
+    resetForm();
+    renderTagManage();
+    toast('All data deleted');
+  });
+
+  // ---------- Start ----------
+  resetForm();
+
+  // Offline support once hosted (e.g. GitHub Pages). Skipped when opened as a local file.
+  if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+})();
+</script>
+</body>
+</html>
