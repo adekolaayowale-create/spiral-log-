@@ -20,6 +20,7 @@
     --accent: #5b8a83;
     --accent-ink: #ffffff;
     --chip: #efebe4;
+    --trig: #e9e4f2;
     --danger: #a5574f;
     --radius: 14px;
   }
@@ -33,6 +34,7 @@
       --accent: #7fb0a8;
       --accent-ink: #13201e;
       --chip: #2f3838;
+      --trig: #33303f;
       --danger: #d48b83;
     }
   }
@@ -49,9 +51,12 @@
   header {
     padding: calc(18px + env(safe-area-inset-top)) 20px 6px;
     max-width: 640px; margin: 0 auto;
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
   }
   header h1 { font-size: 1.35rem; margin: 0; font-weight: 600; letter-spacing: -0.01em; }
   header p { margin: 2px 0 0; color: var(--muted); font-size: 0.9rem; }
+  .icon-btn { background: none; border: none; color: var(--muted); padding: 6px; cursor: pointer; border-radius: 8px; }
+  .icon-btn.active { color: var(--accent); }
   main { max-width: 640px; margin: 0 auto; padding: 8px 16px 24px; }
   .view { display: none; }
   .view.active { display: block; }
@@ -62,10 +67,12 @@
     padding: 16px;
     margin-bottom: 14px;
   }
+  .card.accent { border-color: var(--accent); }
   h2 { font-size: 1.05rem; margin: 0 0 10px; font-weight: 600; }
-  label.field { display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 6px; }
+  h3 { font-size: 0.95rem; margin: 14px 0 6px; font-weight: 600; }
+  label.field, span.field { display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 6px; }
   .hint { color: var(--muted); font-size: 0.85rem; font-weight: 400; }
-  input[type="date"], input[type="text"], textarea {
+  input[type="date"], input[type="text"], textarea, select {
     width: 100%;
     font: inherit;
     color: var(--ink);
@@ -74,11 +81,13 @@
     border-radius: 10px;
     padding: 10px 12px;
   }
-  textarea { min-height: 70px; resize: vertical; }
-  input:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  textarea { min-height: 60px; resize: vertical; }
+  input:focus, textarea:focus, select:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  [hidden] { display: none !important; }
 
-  /* Slider */
-  .distress-head { display: flex; justify-content: space-between; align-items: baseline; }
+  /* Sliders */
+  .slider + .slider { margin-top: 14px; }
+  .distress-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
   .distress-value { font-size: 1.6rem; font-weight: 700; min-width: 2ch; text-align: right; }
   .distress-word { color: var(--muted); font-size: 0.9rem; }
   input[type="range"] {
@@ -87,11 +96,11 @@
   }
   input[type="range"]::-webkit-slider-runnable-track {
     height: 10px; border-radius: 6px;
-    background: linear-gradient(90deg, hsl(150 40% 72%), hsl(45 60% 75%), hsl(10 50% 72%));
+    background: linear-gradient(90deg, hsl(150 45% 72%), hsl(45 65% 75%), hsl(10 55% 72%));
   }
   input[type="range"]::-moz-range-track {
     height: 10px; border-radius: 6px;
-    background: linear-gradient(90deg, hsl(150 40% 72%), hsl(45 60% 75%), hsl(10 50% 72%));
+    background: linear-gradient(90deg, hsl(150 45% 72%), hsl(45 65% 75%), hsl(10 55% 72%));
   }
   input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none; appearance: none;
@@ -124,13 +133,25 @@
     border: 1px solid var(--line); background: var(--chip); color: var(--ink);
     padding: 10px 16px; border-radius: 10px; cursor: pointer;
   }
-  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); width: 100%; padding: 14px; font-size: 1.05rem; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .btn.block { width: 100%; padding: 14px; font-size: 1.05rem; }
   .btn.small { padding: 6px 12px; font-size: 0.85rem; font-weight: 500; }
   .btn.danger { color: var(--danger); }
   .btn.link { background: none; border: none; color: var(--accent); padding: 4px 0; font-weight: 500; }
+  .btn.big { width: 100%; padding: 18px; font-size: 1.1rem; }
   .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .row > .btn.grow { flex: 1; }
+  .stack > * + * { margin-top: 8px; }
   .editing-banner { display: none; justify-content: space-between; align-items: center; background: var(--chip); border-radius: 10px; padding: 8px 12px; margin-bottom: 12px; font-size: 0.9rem; }
   .editing-banner.show { display: flex; }
+
+  /* Timer */
+  .ring { width: 210px; height: 210px; margin: 6px auto 10px; position: relative; }
+  .ring svg { transform: rotate(-90deg); display: block; }
+  .ring .time { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .ring .time strong { font-size: 2.6rem; font-variant-numeric: tabular-nums; }
+  .ring .time span { color: var(--muted); font-size: 0.85rem; }
+  .center { text-align: center; }
 
   /* Calendar */
   .cal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -140,26 +161,29 @@
   .cal-day {
     aspect-ratio: 1 / 1; border-radius: 8px; border: 1px solid transparent;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    font-size: 0.85rem; cursor: pointer; background: none; color: var(--ink); font-family: inherit; padding: 0;
+    font-size: 0.85rem; cursor: pointer; background: none; color: var(--ink); font-family: inherit; padding: 0; position: relative;
   }
   .cal-day.empty { cursor: default; }
   .cal-day.has { color: #2f3a3a; }
   .cal-day .avg { font-size: 0.7rem; opacity: 0.8; }
+  .cal-day .dot { position: absolute; top: 4px; right: 5px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
   .cal-day.today { border-color: var(--accent); }
   .cal-day.selected { outline: 2px solid var(--ink); outline-offset: -2px; }
   .legend { display: flex; gap: 10px; align-items: center; margin-top: 10px; font-size: 0.78rem; color: var(--muted); flex-wrap: wrap; }
   .legend span.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 4px; }
+  .legend span.dotk { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-right: 4px; vertical-align: 1px; }
 
   /* Entries */
   .entry { border-top: 1px solid var(--line); padding: 12px 0; }
   .entry:first-child { border-top: none; padding-top: 0; }
   .entry-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
   .entry-date { font-weight: 600; }
-  .badge { font-weight: 700; color: #2f3a3a; border-radius: 8px; padding: 2px 10px; font-size: 0.9rem; }
+  .kind { font-size: 0.75rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); display: block; font-weight: 600; }
+  .badge { font-weight: 700; color: #2f3a3a; border-radius: 8px; padding: 2px 10px; font-size: 0.9rem; white-space: nowrap; }
   .pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
   .pill { background: var(--chip); border-radius: 999px; padding: 3px 10px; font-size: 0.8rem; }
-  .entry p { margin: 8px 0 0; white-space: pre-wrap; }
-  .entry .trigger { color: var(--muted); font-size: 0.9rem; }
+  .pill.trig { background: var(--trig); }
+  .entry p { margin: 6px 0 0; white-space: pre-wrap; }
   .entry .actions { margin-top: 8px; display: flex; gap: 8px; }
   .empty-msg { color: var(--muted); text-align: center; padding: 10px 0; }
 
@@ -178,9 +202,42 @@
   .bar > div { height: 100%; border-radius: 4px; }
   .note { font-size: 0.85rem; color: var(--muted); }
 
+  /* Ladder */
+  .step { border-top: 1px solid var(--line); padding: 12px 0; }
+  .step:first-child { border-top: none; padding-top: 0; }
+  .step-top { display: flex; gap: 10px; align-items: flex-start; }
+  .tick {
+    flex: none; width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--accent);
+    background: none; color: var(--accent-ink); cursor: pointer; font-size: 0.95rem; line-height: 1; padding: 0;
+  }
+  .tick.on { background: var(--accent); }
+  .step-body { flex: 1; min-width: 0; }
+  .step-text { font-weight: 600; }
+  .step.done .step-text { text-decoration: line-through; color: var(--muted); }
+  .practice-form { background: var(--bg); border-radius: 10px; padding: 12px; margin-top: 10px; }
+
   /* Settings */
   .tag-manage { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
   .tag-manage:first-child { border-top: none; }
+
+  /* Summary */
+  table.sum { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  table.sum th, table.sum td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.sum th { font-weight: 600; color: var(--muted); font-size: 0.78rem; }
+  .sum-wrap { overflow-x: auto; }
+
+  /* Overlay */
+  .overlay {
+    position: fixed; inset: 0; z-index: 50; background: var(--bg);
+    display: flex; align-items: center; justify-content: center; padding: 24px;
+  }
+  .overlay-inner { max-width: 480px; width: 100%; text-align: center; }
+  .name-it-text { font-size: 1.7rem; font-weight: 600; line-height: 1.3; margin: 0 0 32px; }
+  .breath-wrap { height: 240px; display: flex; align-items: center; justify-content: center; }
+  .breath { width: 200px; height: 200px; border-radius: 50%; background: var(--accent); opacity: .75; transform: scale(.5); transition-property: transform; transition-timing-function: ease-in-out; }
+  .breath-label { font-size: 1.4rem; font-weight: 600; margin: 10px 0 28px; min-height: 2em; }
+  .ground-step { font-size: 1.5rem; font-weight: 600; margin: 0 0 8px; }
+  .ground-num { font-size: 4rem; font-weight: 700; color: var(--accent); line-height: 1; margin-bottom: 8px; }
 
   /* Bottom nav */
   nav.tabs {
@@ -192,8 +249,8 @@
   }
   nav.tabs .inner { display: flex; width: 100%; max-width: 640px; }
   nav.tabs button {
-    flex: 1; font: inherit; font-size: 0.8rem; background: none; border: none; color: var(--muted);
-    padding: 10px 4px 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;
+    flex: 1; font: inherit; font-size: 0.78rem; background: none; border: none; color: var(--muted);
+    padding: 10px 2px 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;
   }
   nav.tabs button .ico { display: block; }
   nav.tabs button.active { color: var(--accent); font-weight: 600; }
@@ -201,22 +258,117 @@
   #toast {
     position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px);
     background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 999px; font-size: 0.9rem;
-    opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 20;
+    opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 60;
   }
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+  @media print {
+    body { background: #fff; color: #000; padding: 0; font-size: 12px; }
+    header, nav.tabs, .no-print, #toast { display: none !important; }
+    .view { display: none !important; }
+    #view-summary { display: block !important; }
+    .card { border: none; padding: 0; margin-bottom: 16px; break-inside: avoid; }
+    .stat { background: #f2f2f2; }
+    table.sum th, table.sum td { border-color: #ccc; }
+    main { max-width: none; padding: 0; }
+  }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Spiral Log</h1>
-  <p>Notice what helps.</p>
+  <div>
+    <h1>Spiral Log</h1>
+    <p>Notice what helps.</p>
+  </div>
+  <button class="icon-btn" id="settingsBtn" type="button" aria-label="Settings">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>
+  </button>
 </header>
 
 <main>
+  <!-- NOW -->
+  <section id="view-now" class="view active" aria-label="Right now">
+    <div class="followups"></div>
+
+    <!-- Timer: setup -->
+    <div class="card" id="timerSetup">
+      <h2>Urge to do a compulsion?</h2>
+      <p class="note" style="margin-top:0">Commit to waiting before you do anything. Urges usually rise, peak and fade, and the timer lets you watch that happen.</p>
+      <span class="field">Wait for</span>
+      <div class="chips" id="durChips" role="radiogroup" aria-label="Timer length">
+        <button type="button" class="chip" data-min="5" role="radio">5 min</button>
+        <button type="button" class="chip on" data-min="10" role="radio">10 min</button>
+        <button type="button" class="chip" data-min="15" role="radio">15 min</button>
+      </div>
+      <div class="slider" style="margin-top:14px">
+        <div class="distress-head"><label class="field" for="timerBefore">How strong is the urge right now?</label><span class="distress-value"></span></div>
+        <input type="range" id="timerBefore" min="0" max="10" step="1" value="7">
+        <div class="scale-ends"><span>0</span><span class="distress-word"></span><span>10</span></div>
+      </div>
+      <span class="field" style="margin-top:12px">Trigger <span class="hint">(optional)</span></span>
+      <div class="chips" id="timerTrigChips"></div>
+      <button class="btn primary block" id="startTimer" type="button" style="margin-top:16px">Start waiting</button>
+    </div>
+
+    <!-- Timer: running -->
+    <div class="card accent" id="timerRun" hidden>
+      <h2 class="center" id="timerRunTitle">Waiting it out</h2>
+      <div class="ring">
+        <svg viewBox="0 0 120 120" width="210" height="210" aria-hidden="true">
+          <circle cx="60" cy="60" r="54" fill="none" stroke="var(--chip)" stroke-width="8"/>
+          <circle id="ringFg" cx="60" cy="60" r="54" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round" stroke-dasharray="339.29" stroke-dashoffset="0"/>
+        </svg>
+        <div class="time"><strong id="timerClock">10:00</strong><span>left</span></div>
+      </div>
+      <p class="note center" id="timerMsg">You don't have to do anything with the urge. Just let it be there.</p>
+      <div class="row" style="margin-top:12px">
+        <button class="btn grow" type="button" data-action="name-it">Name it</button>
+        <button class="btn grow" type="button" data-action="breathe">Breathe</button>
+        <button class="btn grow" type="button" data-action="ground">Senses</button>
+      </div>
+      <div class="row" style="margin-top:12px; justify-content:space-between">
+        <button class="btn link" id="stopEarly" type="button">Stop early</button>
+        <button class="btn link" id="cancelTimer" type="button" style="color:var(--muted)">Discard</button>
+      </div>
+    </div>
+
+    <!-- Timer: finished -->
+    <div class="card accent" id="timerEnd" hidden>
+      <h2 id="timerEndTitle">Time's up</h2>
+      <div class="slider">
+        <div class="distress-head"><label class="field" for="timerEndRating">How strong is it now?</label><span class="distress-value"></span></div>
+        <input type="range" id="timerEndRating" min="0" max="10" step="1" value="5">
+        <div class="scale-ends"><span>0</span><span class="distress-word"></span><span>10</span></div>
+      </div>
+      <p class="note" id="timerEndCompare"></p>
+      <span class="field" style="margin-top:12px">Afterwards, did you still do the compulsion?</span>
+      <div class="stack">
+        <button class="btn block" type="button" data-outcome="no">No, I didn't</button>
+        <button class="btn block" type="button" data-outcome="partly">Partly</button>
+        <button class="btn block" type="button" data-outcome="yes">Yes, I did</button>
+      </div>
+      <p class="note">Any answer is useful. Honest data is what shows you the pattern.</p>
+    </div>
+
+    <div class="card">
+      <h2>Name it</h2>
+      <button class="btn primary big" type="button" data-action="name-it">This is an OCD thought</button>
+    </div>
+
+    <div class="card">
+      <h2>Ground me</h2>
+      <div class="row">
+        <button class="btn grow" type="button" data-action="breathe">Breathing pacer</button>
+        <button class="btn grow" type="button" data-action="ground">5-4-3-2-1 senses</button>
+      </div>
+    </div>
+  </section>
+
   <!-- LOG -->
-  <section id="view-log" class="view active" aria-label="Log an entry">
+  <section id="view-log" class="view" aria-label="Log an entry">
+    <div class="followups"></div>
     <div class="editing-banner" id="editingBanner">
       <span>Editing an earlier entry</span>
       <button class="btn small" id="cancelEdit" type="button">Cancel</button>
@@ -228,21 +380,31 @@
     </div>
 
     <div class="card">
-      <div class="distress-head">
-        <label class="field" for="distress">How intense was it?</label>
-        <span class="distress-value" id="distressValue">5</span>
+      <div class="slider">
+        <div class="distress-head"><label class="field" for="logBefore">How intense was it at its worst?</label><span class="distress-value"></span></div>
+        <input type="range" id="logBefore" min="0" max="10" step="1" value="5">
+        <div class="scale-ends"><span>0 calm</span><span class="distress-word"></span><span>10 overwhelming</span></div>
       </div>
-      <input type="range" id="distress" min="0" max="10" step="1" value="5" aria-describedby="distressWord">
-      <div class="scale-ends"><span>0 calm</span><span class="distress-word" id="distressWord">Anxious</span><span>10 overwhelming</span></div>
+      <div class="slider" id="laterWrap" hidden>
+        <div class="distress-head"><label class="field" for="logAfter">And 20–30 minutes later?</label><span class="distress-value"></span></div>
+        <input type="range" id="logAfter" min="0" max="10" step="1" value="5">
+        <div class="scale-ends"><span>0 calm</span><span class="distress-word"></span><span>10 overwhelming</span></div>
+      </div>
+      <button class="btn link" id="laterToggle" type="button" style="margin-top:6px">+ Add the 20–30 minutes later rating now</button>
+      <p class="note" id="laterNote" style="margin:4px 0 0">Or leave it, and if you're logging today the app will ask you in 20 minutes.</p>
     </div>
 
     <div class="card">
-      <label class="field" for="feeling">How I feel <span class="hint">(optional)</span></label>
-      <textarea id="feeling" placeholder="A few words is enough"></textarea>
+      <span class="field">Trigger</span>
+      <div class="chips" id="trigChips"></div>
+      <div class="add-tag">
+        <input type="text" id="newTrig" placeholder="Add a trigger" maxlength="40" aria-label="New trigger name">
+        <button class="btn" id="addTrigBtn" type="button">Add</button>
+      </div>
     </div>
 
     <div class="card">
-      <span class="field">What helped today</span>
+      <span class="field">What helped</span>
       <div class="chips" id="tagChips"></div>
       <div class="add-tag">
         <input type="text" id="newTag" placeholder="Add your own" maxlength="40" aria-label="New tag name">
@@ -251,11 +413,36 @@
     </div>
 
     <div class="card">
-      <label class="field" for="trigger">What set it off <span class="hint">(optional)</span></label>
-      <input type="text" id="trigger" placeholder="e.g. work email, intrusive thought" maxlength="120">
+      <label class="field" for="feeling">Mood in a few words <span class="hint">(optional)</span></label>
+      <textarea id="feeling" placeholder="e.g. tired, on edge. No need to describe the thought."></textarea>
     </div>
 
-    <button class="btn primary" id="saveBtn" type="button">Save entry</button>
+    <button class="btn primary block" id="saveBtn" type="button">Save entry</button>
+  </section>
+
+  <!-- LADDER -->
+  <section id="view-ladder" class="view" aria-label="Exposure ladder">
+    <div class="card">
+      <h2>Exposure ladder</h2>
+      <p class="note" style="margin-top:0">List situations you'd usually avoid or do a compulsion around, from easiest to hardest. Practise each one without the compulsion and log how intense it felt at the start and at the end. This works best planned with a therapist who does ERP (exposure and response prevention).</p>
+    </div>
+
+    <div class="card">
+      <h2>Add a step</h2>
+      <label class="field" for="ladderText">Situation</label>
+      <input type="text" id="ladderText" maxlength="120" placeholder="e.g. Touch the door handle and don't wash for 10 min">
+      <div class="slider" style="margin-top:14px">
+        <div class="distress-head"><label class="field" for="ladderPredicted">How hard do you expect it to be?</label><span class="distress-value"></span></div>
+        <input type="range" id="ladderPredicted" min="0" max="10" step="1" value="4">
+        <div class="scale-ends"><span>0 easy</span><span class="distress-word"></span><span>10 hardest</span></div>
+      </div>
+      <button class="btn primary block" id="addStep" type="button" style="margin-top:12px">Add to ladder</button>
+    </div>
+
+    <div class="card">
+      <h2>Your ladder</h2>
+      <div id="ladderList"></div>
+    </div>
   </section>
 
   <!-- HISTORY -->
@@ -271,26 +458,32 @@
         <span><span class="sw" id="lgLow"></span>0–3</span>
         <span><span class="sw" id="lgMid"></span>4–6</span>
         <span><span class="sw" id="lgHigh"></span>7–10</span>
-        <span>Number = average for that day</span>
+        <span><span class="dotk"></span>delay timer used</span>
       </div>
     </div>
 
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;">
-        <h2 id="listTitle" style="margin:0 0 10px">All entries</h2>
+        <h2 id="listTitle" style="margin:0 0 10px">Everything</h2>
         <button class="btn link" id="showAll" type="button" style="display:none">Show all</button>
       </div>
       <div id="entryList"></div>
     </div>
   </section>
 
-  <!-- PATTERNS -->
-  <section id="view-patterns" class="view" aria-label="Patterns">
+  <!-- REVIEW -->
+  <section id="view-patterns" class="view" aria-label="Monthly review">
     <div id="patternsBody"></div>
   </section>
 
   <!-- SETTINGS -->
   <section id="view-settings" class="view" aria-label="Settings">
+    <div class="card">
+      <h2>For your therapist</h2>
+      <p class="note" style="margin-top:0">A clean summary of your entries, delay timers, triggers and ladder to bring to an appointment. You can print it or save it as a PDF.</p>
+      <button class="btn primary" id="openSummary" type="button">Create summary</button>
+    </div>
+
     <div class="card">
       <h2>Your data</h2>
       <p class="note" style="margin-top:0">Everything is stored only in this browser on this device. Nothing is sent anywhere. Export a backup now and then, especially before clearing your browser data.</p>
@@ -302,86 +495,109 @@
     </div>
 
     <div class="card">
+      <h2>Trigger tags</h2>
+      <div id="trigManage"></div>
+    </div>
+
+    <div class="card">
       <h2>"What helped" tags</h2>
       <div id="tagManage"></div>
-      <p class="note">Removing a tag hides it from the log screen. Past entries keep it.</p>
+      <p class="note">Removing a tag hides it from the Log screen. Past entries keep it. Add new tags from the Log screen.</p>
     </div>
 
     <div class="card">
       <h2>Start over</h2>
-      <p class="note" style="margin-top:0">Deletes every entry from this device. This can't be undone, so export first if you want a copy.</p>
+      <p class="note" style="margin-top:0">Deletes every entry, timer and ladder step from this device. This can't be undone, so export first if you want a copy.</p>
       <button class="btn danger" id="wipeBtn" type="button">Delete all data</button>
     </div>
+  </section>
+
+  <!-- THERAPIST SUMMARY -->
+  <section id="view-summary" class="view" aria-label="Therapist summary">
+    <div class="card no-print">
+      <div class="row" style="align-items:center">
+        <label for="sumPeriod" class="field" style="margin:0">Period</label>
+        <select id="sumPeriod" style="width:auto;flex:1">
+          <option value="30">Last 30 days</option>
+          <option value="90" selected>Last 90 days</option>
+          <option value="all">Everything</option>
+        </select>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn primary grow" id="printSummary" type="button">Print / save as PDF</button>
+        <button class="btn" id="closeSummary" type="button">Back</button>
+      </div>
+      <p class="note" style="margin-bottom:0">On a phone, use Print, then choose "Save as PDF" to keep or share it.</p>
+    </div>
+    <div id="summaryBody"></div>
   </section>
 </main>
 
 <nav class="tabs" aria-label="Sections">
   <div class="inner">
-    <button type="button" data-view="log" class="active"><svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg>Log</button>
+    <button type="button" data-view="now" class="active"><svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>Now</button>
+    <button type="button" data-view="log"><svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg>Log</button>
+    <button type="button" data-view="ladder"><svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v18M17 3v18M7 7h10M7 12h10M7 17h10"/></svg>Ladder</button>
     <button type="button" data-view="history"><svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>History</button>
     <button type="button" data-view="patterns"><svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Review</button>
-    <button type="button" data-view="settings"><svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Settings</button>
   </div>
 </nav>
 
+<div class="overlay" id="overlay" hidden role="dialog" aria-modal="true"><div class="overlay-inner" id="overlayBody"></div></div>
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script>
 (function () {
   'use strict';
 
-  // ---------- Storage ----------
-  const STORE_KEY = 'spiralLog.v1';
+  // ================= Settings you can change =================
+  const NAME_IT_TEXT = 'This is an OCD thought, not a fact.';
   const DEFAULT_TAGS = ['Walk', 'Talked to someone', 'Delayed the compulsion', 'Sleep', 'Music'];
+  const DEFAULT_TRIGGERS = ['Contamination', 'Checking', 'Harm thoughts', 'Work stress', 'Poor sleep', 'Social'];
+  const FOLLOW_UP_MIN = 20;      // ask for the "later" rating after this many minutes
+  const FOLLOW_UP_EXPIRE_MIN = 240; // stop asking after this many minutes
+  // ===========================================================
 
+  const STORE_KEY = 'spiralLog.v1';
+
+  function blankState() {
+    return { entries: [], urges: [], ladder: [], nameIt: [], tags: DEFAULT_TAGS.slice(), triggerTags: DEFAULT_TRIGGERS.slice(), review: {}, activeTimer: null };
+  }
   function load() {
+    const s = blankState();
     try {
       const raw = localStorage.getItem(STORE_KEY);
       if (raw) {
         const d = JSON.parse(raw);
-        return {
-          entries: Array.isArray(d.entries) ? d.entries : [],
-          tags: Array.isArray(d.tags) ? d.tags : DEFAULT_TAGS.slice(),
-          review: d.review && typeof d.review === 'object' ? d.review : {}
-        };
+        ['entries', 'urges', 'ladder', 'nameIt', 'tags', 'triggerTags'].forEach((k) => { if (Array.isArray(d[k])) s[k] = d[k]; });
+        if (d.review && typeof d.review === 'object') s.review = d.review;
+        if (d.activeTimer && typeof d.activeTimer === 'object') s.activeTimer = d.activeTimer;
       }
-    } catch (e) { /* fall through to defaults */ }
-    return { entries: [], tags: DEFAULT_TAGS.slice(), review: {} };
+    } catch (e) { /* use defaults */ }
+    return s;
   }
-
   function save() {
-    try {
-      localStorage.setItem(STORE_KEY, JSON.stringify(state));
-      return true;
-    } catch (e) {
-      toast('Could not save on this device');
-      return false;
-    }
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); return true; }
+    catch (e) { toast('Could not save on this device'); return false; }
   }
-
   let state = load();
 
-  // ---------- Helpers ----------
+  // ================= Helpers =================
   const $ = (id) => document.getElementById(id);
-
-  function pad(n) { return String(n).padStart(2, '0'); }
-  function dateKey(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
-  function todayKey() { return dateKey(new Date()); }
+  const pad = (n) => String(n).padStart(2, '0');
+  const dateKey = (d) => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  const todayKey = () => dateKey(new Date());
   function parseKey(k) { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); }
-  function prettyDate(k) {
-    return parseKey(k).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-  }
-  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
-  function esc(s) {
-    return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  }
-  function avg(arr) { return arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null; }
-  function fmt1(n) { return n === null ? '–' : (Math.round(n * 10) / 10).toString(); }
-
-  function distressColor(v) {
-    const h = 150 - (Math.max(0, Math.min(10, v)) / 10) * 140; // green -> red
-    return 'hsl(' + h + ' 55% 80%)';
-  }
+  const prettyDate = (k) => parseKey(k).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  const shortDate = (k) => parseKey(k).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+  const clockTime = (ts) => new Date(ts).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const avg = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null);
+  const fmt1 = (n) => (n === null || n === undefined || isNaN(n) ? '–' : String(Math.round(n * 10) / 10));
+  const isNum = (v) => typeof v === 'number' && !isNaN(v);
+  function mmss(sec) { sec = Math.max(0, Math.round(sec)); return Math.floor(sec / 60) + ':' + pad(sec % 60); }
+  function distressColor(v) { const h = 150 - (Math.max(0, Math.min(10, v)) / 10) * 140; return 'hsl(' + h + ' 55% 80%)'; }
   function distressWord(v) {
     if (v <= 2) return 'Calm';
     if (v <= 4) return 'Uneasy';
@@ -389,100 +605,362 @@
     if (v <= 8) return 'Very distressed';
     return 'Overwhelming';
   }
+  const OUTCOME_TEXT = { no: "Didn't do the compulsion", partly: 'Partly did it', yes: 'Did the compulsion' };
 
   let toastTimer;
   function toast(msg) {
     const t = $('toast');
-    t.textContent = msg;
-    t.classList.add('show');
+    t.textContent = msg; t.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
   }
 
-  function sortedEntries() {
-    return state.entries.slice().sort((a, b) =>
-      a.date === b.date ? (b.createdAt || 0) - (a.createdAt || 0) : (a.date < b.date ? 1 : -1));
+  // Sliders: keep number + word in sync
+  function syncSlider(input) {
+    const w = input.closest('.slider');
+    if (!w) return;
+    w.querySelector('.distress-value').textContent = input.value;
+    w.querySelector('.distress-word').textContent = distressWord(Number(input.value));
   }
+  function setSlider(id, v) { const el = $(id); el.value = v; syncSlider(el); }
+  function sliderHTML(id, label, value, low, high) {
+    return '<div class="slider"><div class="distress-head"><label class="field" for="' + id + '">' + label + '</label><span class="distress-value">' + value + '</span></div>' +
+      '<input type="range" id="' + id + '" min="0" max="10" step="1" value="' + value + '">' +
+      '<div class="scale-ends"><span>' + (low || '0') + '</span><span class="distress-word">' + distressWord(value) + '</span><span>' + (high || '10') + '</span></div></div>';
+  }
+  document.addEventListener('input', (e) => { if (e.target.matches('.slider input[type=range]')) syncSlider(e.target); });
+  document.querySelectorAll('.slider input[type=range]').forEach(syncSlider);
 
-  // ---------- Navigation ----------
-  const views = ['log', 'history', 'patterns', 'settings'];
+  // Tag chip groups
+  function chipGroup(containerId, getList) {
+    const el = $(containerId);
+    const g = {
+      selected: new Set(),
+      render() {
+        const list = getList().slice();
+        g.selected.forEach((t) => { if (!list.includes(t)) list.push(t); });
+        el.innerHTML = list.map((t) =>
+          '<button type="button" class="chip' + (g.selected.has(t) ? ' on' : '') + '" aria-pressed="' + g.selected.has(t) + '" data-tag="' + esc(t) + '">' + esc(t) + '</button>').join('');
+      }
+    };
+    el.addEventListener('click', (e) => {
+      const c = e.target.closest('.chip'); if (!c) return;
+      const t = c.dataset.tag;
+      if (g.selected.has(t)) g.selected.delete(t); else g.selected.add(t);
+      g.render();
+    });
+    return g;
+  }
+  const helpedChips = chipGroup('tagChips', () => state.tags);
+  const trigChips = chipGroup('trigChips', () => state.triggerTags);
+  const timerTrigChips = chipGroup('timerTrigChips', () => state.triggerTags);
+
+  function addTagTo(listKey, inputId, group) {
+    const name = $(inputId).value.trim().replace(/\s+/g, ' ');
+    if (!name) return;
+    const existing = state[listKey].find((t) => t.toLowerCase() === name.toLowerCase());
+    const tag = existing || name;
+    if (!existing) state[listKey].push(tag);
+    group.selected.add(tag);
+    save();
+    $(inputId).value = '';
+    helpedChips.render(); trigChips.render(); timerTrigChips.render();
+  }
+  $('addTagBtn').addEventListener('click', () => addTagTo('tags', 'newTag', helpedChips));
+  $('newTag').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addTagTo('tags', 'newTag', helpedChips); } });
+  $('addTrigBtn').addEventListener('click', () => addTagTo('triggerTags', 'newTrig', trigChips));
+  $('newTrig').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addTagTo('triggerTags', 'newTrig', trigChips); } });
+
+  // ================= Navigation =================
+  let currentView = 'now';
   function show(view) {
-    views.forEach((v) => $('view-' + v).classList.toggle('active', v === view));
+    currentView = view;
+    document.querySelectorAll('.view').forEach((v) => v.classList.toggle('active', v.id === 'view-' + view));
     document.querySelectorAll('nav.tabs button').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
+    $('settingsBtn').classList.toggle('active', view === 'settings' || view === 'summary');
+    if (view === 'now' || view === 'log') renderFollowUps(true);
+    if (view === 'now') renderTimer();
+    if (view === 'ladder') renderLadder();
     if (view === 'history') renderHistory();
     if (view === 'patterns') renderPatterns();
-    if (view === 'settings') renderTagManage();
+    if (view === 'settings') renderSettings();
+    if (view === 'summary') renderSummary();
     window.scrollTo(0, 0);
   }
   document.querySelectorAll('nav.tabs button').forEach((b) => b.addEventListener('click', () => show(b.dataset.view)));
+  $('settingsBtn').addEventListener('click', () => show(currentView === 'settings' ? 'now' : 'settings'));
 
-  // ---------- Log form ----------
-  let selectedTags = new Set();
-  let editingId = null;
-
-  function updateDistressDisplay() {
-    const v = Number($('distress').value);
-    $('distressValue').textContent = v;
-    $('distressWord').textContent = distressWord(v);
+  // ================= Overlays: Name it, breathing, 5-4-3-2-1 =================
+  let breathTimer = null;
+  function openOverlay(html) {
+    $('overlayBody').innerHTML = html;
+    $('overlay').hidden = false;
+    const btn = $('overlayBody').querySelector('button');
+    if (btn) btn.focus();
   }
-  $('distress').addEventListener('input', updateDistressDisplay);
-
-  function renderTagChips() {
-    // Show active tags, plus any tag selected on the entry being edited (even if since removed)
-    const list = state.tags.slice();
-    selectedTags.forEach((t) => { if (!list.includes(t)) list.push(t); });
-    $('tagChips').innerHTML = list.map((t) =>
-      '<button type="button" class="chip' + (selectedTags.has(t) ? ' on' : '') + '" aria-pressed="' + selectedTags.has(t) + '" data-tag="' + esc(t) + '">' + esc(t) + '</button>'
-    ).join('');
+  function closeOverlay() {
+    clearTimeout(breathTimer); breathTimer = null;
+    $('overlay').hidden = true;
+    $('overlayBody').innerHTML = '';
   }
-  $('tagChips').addEventListener('click', (e) => {
-    const chip = e.target.closest('.chip');
-    if (!chip) return;
-    const t = chip.dataset.tag;
-    if (selectedTags.has(t)) selectedTags.delete(t); else selectedTags.add(t);
-    renderTagChips();
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('overlay').hidden) closeOverlay(); });
+
+  function nameIt() {
+    state.nameIt.push(Date.now());
+    save();
+    openOverlay('<p class="name-it-text">' + esc(NAME_IT_TEXT) + '</p><button class="btn primary" type="button" data-action="close">Close</button>');
+  }
+
+  function breathe() {
+    openOverlay('<div class="breath-wrap"><div class="breath" id="breathCircle"></div></div>' +
+      '<p class="breath-label" id="breathLabel">Get comfortable</p>' +
+      '<p class="note">In for 4, out for 6. Follow the circle.</p>' +
+      '<button class="btn" type="button" data-action="close">Done</button>');
+    const circle = $('breathCircle'), label = $('breathLabel');
+    const phases = [['Breathe in', 4000, 1], ['Breathe out', 6000, 0.5]];
+    let i = 0;
+    function next() {
+      if ($('overlay').hidden) return;
+      const [text, ms, scale] = phases[i % 2];
+      label.textContent = text;
+      circle.style.transitionDuration = ms + 'ms';
+      circle.style.transform = 'scale(' + scale + ')';
+      i++;
+      breathTimer = setTimeout(next, ms);
+    }
+    breathTimer = setTimeout(next, 600);
+  }
+
+  const GROUND_STEPS = [
+    [5, 'things you can see'],
+    [4, 'things you can feel'],
+    [3, 'things you can hear'],
+    [2, 'things you can smell'],
+    [1, 'thing you can taste']
+  ];
+  function ground(step) {
+    step = step || 0;
+    if (step >= GROUND_STEPS.length) {
+      openOverlay('<p class="ground-step">Well done.</p><p class="note">Take a breath and notice how you feel now.</p><button class="btn primary" type="button" data-action="close">Close</button>');
+      return;
+    }
+    const [n, text] = GROUND_STEPS[step];
+    openOverlay('<div class="ground-num">' + n + '</div><p class="ground-step">' + text + '</p>' +
+      '<p class="note">Name them slowly, out loud or in your head.</p>' +
+      '<div class="row" style="justify-content:center;margin-top:24px">' +
+      '<button class="btn primary" type="button" data-action="ground-next" data-step="' + (step + 1) + '">Next</button>' +
+      '<button class="btn" type="button" data-action="close">Stop</button></div>');
+  }
+
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-action]');
+    if (!b) return;
+    const a = b.dataset.action;
+    if (a === 'name-it') nameIt();
+    else if (a === 'breathe') breathe();
+    else if (a === 'ground') ground(0);
+    else if (a === 'ground-next') ground(Number(b.dataset.step));
+    else if (a === 'close') closeOverlay();
   });
 
-  function addTag() {
-    const name = $('newTag').value.trim().replace(/\s+/g, ' ');
-    if (!name) return;
-    const existing = state.tags.find((t) => t.toLowerCase() === name.toLowerCase());
-    const tag = existing || name;
-    if (!existing) state.tags.push(tag);
-    selectedTags.add(tag);
+  // ================= Delay timer =================
+  let chosenMin = 10;
+  let audioCtx = null;
+  let endShownFor = null;
+
+  $('durChips').addEventListener('click', (e) => {
+    const c = e.target.closest('.chip'); if (!c) return;
+    chosenMin = Number(c.dataset.min);
+    $('durChips').querySelectorAll('.chip').forEach((x) => { x.classList.toggle('on', x === c); x.setAttribute('aria-checked', x === c); });
+  });
+
+  $('startTimer').addEventListener('click', () => {
+    try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); } catch (err) { audioCtx = null; }
+    state.activeTimer = {
+      id: uid(), startedAt: Date.now(), plannedMin: chosenMin,
+      before: Number($('timerBefore').value), triggers: Array.from(timerTrigChips.selected), stoppedAt: null, chimed: false
+    };
     save();
-    $('newTag').value = '';
-    renderTagChips();
+    renderTimer();
+    window.scrollTo(0, 0);
+  });
+
+  $('stopEarly').addEventListener('click', () => {
+    if (!state.activeTimer) return;
+    state.activeTimer.stoppedAt = Date.now();
+    save(); renderTimer();
+  });
+  $('cancelTimer').addEventListener('click', () => {
+    if (!state.activeTimer || !confirm('Discard this timer without logging it?')) return;
+    state.activeTimer = null; save(); renderTimer();
+  });
+
+  function timerElapsedSec(t) {
+    const end = t.stoppedAt || Math.min(Date.now(), t.startedAt + t.plannedMin * 60000);
+    return (end - t.startedAt) / 1000;
   }
-  $('addTagBtn').addEventListener('click', addTag);
-  $('newTag').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } });
+  function timerFinished(t) { return !!t.stoppedAt || Date.now() >= t.startedAt + t.plannedMin * 60000; }
+
+  function chime() {
+    try { if (navigator.vibrate) navigator.vibrate([200, 120, 200]); } catch (e) {}
+    try {
+      if (!audioCtx) return;
+      [0, 0.35].forEach((delay) => {
+        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.frequency.value = 660; o.type = 'sine';
+        g.gain.setValueAtTime(0.0001, audioCtx.currentTime + delay);
+        g.gain.exponentialRampToValueAtTime(0.2, audioCtx.currentTime + delay + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + delay + 0.3);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(audioCtx.currentTime + delay); o.stop(audioCtx.currentTime + delay + 0.32);
+      });
+    } catch (e) {}
+  }
+
+  const TIMER_MSGS = [
+    "You don't have to do anything with the urge. Just let it be there.",
+    'Urges rise and fall like waves. You are riding this one out.',
+    'Notice where you feel it in your body, without trying to change it.',
+    "The urge isn't an instruction. You can feel it and not act on it."
+  ];
+
+  function renderTimer() {
+    const t = state.activeTimer;
+    $('timerSetup').hidden = !!t;
+    $('timerRun').hidden = !t || timerFinished(t);
+    $('timerEnd').hidden = !t || !timerFinished(t);
+    if (!t) { endShownFor = null; timerTrigChips.selected.clear(); timerTrigChips.render(); return; }
+
+    if (!timerFinished(t)) {
+      const total = t.plannedMin * 60;
+      const left = total - (Date.now() - t.startedAt) / 1000;
+      $('timerClock').textContent = mmss(left);
+      $('ringFg').setAttribute('stroke-dashoffset', String(339.29 * (1 - Math.max(0, left) / total)));
+      $('timerRunTitle').textContent = 'Waiting ' + t.plannedMin + ' minutes';
+      const idx = Math.min(TIMER_MSGS.length - 1, Math.floor(((Date.now() - t.startedAt) / 1000) / 90));
+      $('timerMsg').textContent = TIMER_MSGS[idx];
+      return;
+    }
+    // finished
+    if (endShownFor !== t.id) {
+      endShownFor = t.id;
+      if (!t.chimed && !t.stoppedAt) { t.chimed = true; save(); chime(); }
+      const waited = timerElapsedSec(t);
+      $('timerEndTitle').textContent = t.stoppedAt && waited < t.plannedMin * 60 - 1
+        ? 'You waited ' + mmss(waited)
+        : "Time's up. You waited the full " + t.plannedMin + ' minutes.';
+      setSlider('timerEndRating', t.before);
+    }
+    $('timerEndCompare').textContent = 'When you started it was ' + t.before + '/10.';
+  }
+
+  document.querySelectorAll('[data-outcome]').forEach((b) => b.addEventListener('click', () => {
+    const t = state.activeTimer; if (!t) return;
+    state.urges.push({
+      id: t.id,
+      date: dateKey(new Date(t.startedAt)),
+      startedAt: t.startedAt,
+      endedAt: Date.now(),
+      plannedMin: t.plannedMin,
+      waitedSec: Math.round(timerElapsedSec(t)),
+      before: t.before,
+      endRating: Number($('timerEndRating').value),
+      after: null,
+      fuDone: false,
+      outcome: b.dataset.outcome,
+      triggers: t.triggers || []
+    });
+    state.activeTimer = null;
+    save();
+    renderTimer();
+    renderFollowUps(true);
+    toast('Logged. Well done for waiting.');
+  }));
+
+  // ================= Follow-up ("20–30 minutes later") ratings =================
+  function followUpItems() {
+    const now = Date.now(), due = [], upcoming = [];
+    const exp = FOLLOW_UP_EXPIRE_MIN * 60000;
+    state.urges.forEach((u) => {
+      if (u.after !== null && u.after !== undefined) return;
+      if (u.fuDone) return;
+      const at = u.startedAt + FOLLOW_UP_MIN * 60000;
+      const item = { kind: 'urge', id: u.id, before: u.before, at: at, what: 'the delay timer you started at ' + clockTime(u.startedAt) };
+      if (now >= at && now < at + exp) due.push(item); else if (now < at) upcoming.push(item);
+    });
+    state.entries.forEach((e) => {
+      if (!e.followUpAt || e.fuDone || isNum(e.after)) return;
+      const item = { kind: 'entry', id: e.id, before: e.distress, at: e.followUpAt, what: 'the entry you logged at ' + clockTime(e.followUpAt - FOLLOW_UP_MIN * 60000) };
+      if (now >= e.followUpAt && now < e.followUpAt + exp) due.push(item); else if (now < e.followUpAt) upcoming.push(item);
+    });
+    return { due, upcoming };
+  }
+  let lastFuKey = '';
+  let fuSeq = 0;
+  function renderFollowUps(force) {
+    const { due, upcoming } = followUpItems();
+    const key = due.map((d) => d.id).join(',') + '|' + upcoming.map((d) => d.id).join(',');
+    if (!force && key === lastFuKey) return;
+    lastFuKey = key;
+    let html = '';
+    due.forEach((d) => {
+      html += '<div class="card accent"><h2>How intense is it now?</h2>' +
+        '<p class="note" style="margin-top:0">About ' + FOLLOW_UP_MIN + ' minutes have passed since ' + esc(d.what) + '. Back then you rated it ' + d.before + '/10.</p>' +
+        sliderHTML('fu-' + d.id + '-' + (fuSeq++), 'Right now', d.before) +
+        '<div class="row" style="margin-top:12px"><button class="btn primary grow" type="button" data-fu-save="' + d.kind + ':' + d.id + '">Save</button>' +
+        '<button class="btn" type="button" data-fu-skip="' + d.kind + ':' + d.id + '">Skip</button></div></div>';
+    });
+    if (!due.length && upcoming.length) {
+      const next = upcoming.sort((a, b) => a.at - b.at)[0];
+      html += '<p class="note" style="margin:0 4px 12px">Check-in at ' + clockTime(next.at) + ': open the app then to rate how it feels.</p>';
+    }
+    document.querySelectorAll('.followups').forEach((el) => { el.innerHTML = html; });
+  }
+  document.addEventListener('click', (e) => {
+    const s = e.target.closest('[data-fu-save]'), k = e.target.closest('[data-fu-skip]');
+    const el = s || k; if (!el) return;
+    const [kind, id] = (s ? s.dataset.fuSave : k.dataset.fuSkip).split(':');
+    const list = kind === 'urge' ? state.urges : state.entries;
+    const rec = list.find((x) => x.id === id); if (!rec) return;
+    if (s) { rec.after = Number(el.closest('.card').querySelector('input[type=range]').value); toast('Saved'); }
+    rec.fuDone = true;
+    save();
+    renderFollowUps(true);
+  });
+
+  // ================= Log form =================
+  let editingId = null;
+  let laterOn = false;
+  function setLater(on) {
+    laterOn = on;
+    $('laterWrap').hidden = !on;
+    $('laterToggle').textContent = on ? 'Remove the later rating' : '+ Add the 20–30 minutes later rating now';
+    $('laterNote').hidden = on;
+  }
+  $('laterToggle').addEventListener('click', () => { if (!laterOn) setSlider('logAfter', $('logBefore').value); setLater(!laterOn); });
 
   function resetForm() {
     editingId = null;
-    selectedTags = new Set();
+    helpedChips.selected = new Set(); trigChips.selected = new Set();
     $('date').value = todayKey();
-    $('distress').value = 5;
+    setSlider('logBefore', 5); setSlider('logAfter', 5); setLater(false);
     $('feeling').value = '';
-    $('trigger').value = '';
     $('editingBanner').classList.remove('show');
     $('saveBtn').textContent = 'Save entry';
-    updateDistressDisplay();
-    renderTagChips();
+    helpedChips.render(); trigChips.render();
   }
-
   function startEdit(id) {
-    const e = state.entries.find((x) => x.id === id);
-    if (!e) return;
+    const e = state.entries.find((x) => x.id === id); if (!e) return;
     editingId = id;
-    selectedTags = new Set(e.tags || []);
+    helpedChips.selected = new Set(e.tags || []);
+    trigChips.selected = new Set(e.triggers || []);
     $('date').value = e.date;
-    $('distress').value = e.distress;
+    setSlider('logBefore', e.distress);
+    if (isNum(e.after)) { setSlider('logAfter', e.after); setLater(true); } else setLater(false);
     $('feeling').value = e.feeling || '';
-    $('trigger').value = e.trigger || '';
     $('editingBanner').classList.add('show');
     $('saveBtn').textContent = 'Save changes';
-    updateDistressDisplay();
-    renderTagChips();
+    helpedChips.render(); trigChips.render();
     show('log');
   }
   $('cancelEdit').addEventListener('click', resetForm);
@@ -492,70 +970,125 @@
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { toast('Please pick a date'); return; }
     const data = {
       date: date,
-      distress: Number($('distress').value),
+      distress: Number($('logBefore').value),
+      after: laterOn ? Number($('logAfter').value) : null,
       feeling: $('feeling').value.trim(),
-      tags: Array.from(selectedTags),
-      trigger: $('trigger').value.trim()
+      tags: Array.from(helpedChips.selected),
+      triggers: Array.from(trigChips.selected)
     };
     if (editingId) {
       const i = state.entries.findIndex((x) => x.id === editingId);
       if (i >= 0) state.entries[i] = Object.assign({}, state.entries[i], data, { updatedAt: Date.now() });
     } else {
-      state.entries.push(Object.assign({ id: uid(), createdAt: Date.now() }, data));
+      const now = Date.now();
+      const entry = Object.assign({ id: uid(), createdAt: now }, data);
+      if (!laterOn && date === todayKey()) entry.followUpAt = now + FOLLOW_UP_MIN * 60000;
+      state.entries.push(entry);
     }
     if (save()) {
-      toast(editingId ? 'Changes saved' : 'Saved');
+      const wasEdit = !!editingId;
+      const askLater = !wasEdit && !laterOn && date === todayKey();
       resetForm();
+      renderFollowUps(true);
+      toast(wasEdit ? 'Changes saved' : askLater ? 'Saved. Check back in ' + FOLLOW_UP_MIN + ' min.' : 'Saved');
     }
   });
 
-  // ---------- History ----------
+  // ================= Exposure ladder =================
+  let practiceOpen = null;
+  $('addStep').addEventListener('click', () => {
+    const text = $('ladderText').value.trim();
+    if (!text) { toast('Describe the situation first'); $('ladderText').focus(); return; }
+    state.ladder.push({ id: uid(), text: text, predicted: Number($('ladderPredicted').value), done: false, practices: [], createdAt: Date.now() });
+    save();
+    $('ladderText').value = '';
+    renderLadder();
+    toast('Added to your ladder');
+  });
+
+  function renderLadder() {
+    const steps = state.ladder.slice().sort((a, b) => a.predicted - b.predicted || a.createdAt - b.createdAt);
+    if (!steps.length) { $('ladderList').innerHTML = '<div class="empty-msg">No steps yet. Start with something around 3–4/10.</div>'; return; }
+    $('ladderList').innerHTML = steps.map((s) => {
+      const p = s.practices || [];
+      let summary = 'Expected ' + s.predicted + '/10';
+      if (p.length) {
+        const first = p[0], last = p[p.length - 1];
+        summary += ' · practised ' + p.length + '×';
+        summary += p.length > 1
+          ? ' · first ' + first.before + '→' + first.after + ', latest ' + last.before + '→' + last.after
+          : ' · ' + first.before + '→' + first.after;
+      }
+      const recent = p.slice(-5).reverse().map((x) =>
+        '<span class="pill">' + esc(shortDate(x.date)) + ': ' + x.before + '→' + x.after + '</span>').join('');
+      const form = practiceOpen === s.id
+        ? '<div class="practice-form">' + sliderHTML('pBefore', 'At the start', s.predicted) +
+          sliderHTML('pAfter', 'At the end', Math.max(0, s.predicted - 2)) +
+          '<div class="row" style="margin-top:12px"><button class="btn primary grow" type="button" data-p-save="' + s.id + '">Save practice</button>' +
+          '<button class="btn" type="button" data-p-cancel>Cancel</button></div></div>'
+        : '';
+      return '<div class="step' + (s.done ? ' done' : '') + '"><div class="step-top">' +
+        '<button type="button" class="tick' + (s.done ? ' on' : '') + '" data-tick="' + s.id + '" aria-pressed="' + s.done + '" aria-label="Mark as mastered">' + (s.done ? '✓' : '') + '</button>' +
+        '<div class="step-body"><div class="step-text">' + esc(s.text) + '</div>' +
+        '<div class="tag-meta">' + summary + '</div>' +
+        (recent ? '<div class="pills">' + recent + '</div>' : '') +
+        (practiceOpen === s.id ? form : '<div class="actions row" style="margin-top:8px"><button class="btn small" type="button" data-p-open="' + s.id + '">Log practice</button>' +
+          '<button class="btn small danger" type="button" data-step-del="' + s.id + '">Delete</button></div>') +
+        '</div></div></div>';
+    }).join('');
+  }
+  $('ladderList').addEventListener('click', (e) => {
+    const t = e.target.closest('[data-tick]'), o = e.target.closest('[data-p-open]'), sv = e.target.closest('[data-p-save]'),
+      c = e.target.closest('[data-p-cancel]'), d = e.target.closest('[data-step-del]');
+    if (t) { const s = state.ladder.find((x) => x.id === t.dataset.tick); s.done = !s.done; save(); renderLadder(); if (s.done) toast('Step mastered'); }
+    if (o) { practiceOpen = o.dataset.pOpen; renderLadder(); }
+    if (c) { practiceOpen = null; renderLadder(); }
+    if (sv) {
+      const s = state.ladder.find((x) => x.id === sv.dataset.pSave);
+      s.practices = s.practices || [];
+      s.practices.push({ id: uid(), date: todayKey(), at: Date.now(), before: Number($('pBefore').value), after: Number($('pAfter').value) });
+      practiceOpen = null; save(); renderLadder(); toast('Practice logged');
+    }
+    if (d && confirm('Delete this step and its practice history?')) {
+      state.ladder = state.ladder.filter((x) => x.id !== d.dataset.stepDel); save(); renderLadder();
+    }
+  });
+
+  // ================= History =================
   let calMonth = (() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); })();
   let selectedDay = null;
 
-  function entriesByDay() {
-    const map = {};
-    state.entries.forEach((e) => { (map[e.date] = map[e.date] || []).push(e); });
-    return map;
-  }
-
   function renderCalendar() {
-    const byDay = entriesByDay();
+    const byDay = {}, urgeDays = {};
+    state.entries.forEach((e) => { (byDay[e.date] = byDay[e.date] || []).push(e.distress); });
+    state.urges.forEach((u) => { urgeDays[u.date] = (urgeDays[u.date] || 0) + 1; });
     $('monthLabel').textContent = calMonth.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
-    const dows = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    let html = dows.map((d) => '<div class="cal-dow">' + d + '</div>').join('');
-    const first = calMonth;
-    const offset = (first.getDay() + 6) % 7; // Monday-first
-    const daysInMonth = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+    let html = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => '<div class="cal-dow">' + d + '</div>').join('');
+    const offset = (calMonth.getDay() + 6) % 7;
+    const days = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 0).getDate();
     for (let i = 0; i < offset; i++) html += '<div class="cal-day empty"></div>';
     const today = todayKey();
-    for (let d = 1; d <= daysInMonth; d++) {
-      const key = dateKey(new Date(first.getFullYear(), first.getMonth(), d));
-      const list = byDay[key];
-      const classes = ['cal-day'];
-      let style = '';
-      let inner = '<span>' + d + '</span>';
-      let label = prettyDate(key);
-      if (list) {
-        const a = avg(list.map((e) => e.distress));
-        classes.push('has');
-        style = ' style="background:' + distressColor(a) + '"';
+    for (let d = 1; d <= days; d++) {
+      const key = dateKey(new Date(calMonth.getFullYear(), calMonth.getMonth(), d));
+      const cls = ['cal-day']; let style = '', inner = '<span>' + d + '</span>', label = prettyDate(key);
+      if (byDay[key]) {
+        const a = avg(byDay[key]);
+        cls.push('has'); style = ' style="background:' + distressColor(a) + '"';
         inner += '<span class="avg">' + fmt1(a) + '</span>';
-        label += ', average ' + fmt1(a) + ', ' + list.length + (list.length === 1 ? ' entry' : ' entries');
+        label += ', average ' + fmt1(a);
       }
-      if (key === today) classes.push('today');
-      if (key === selectedDay) classes.push('selected');
-      html += '<button type="button" class="' + classes.join(' ') + '"' + style + ' data-day="' + key + '" aria-label="' + esc(label) + '">' + inner + '</button>';
+      if (urgeDays[key]) { inner += '<span class="dot"></span>'; label += ', ' + urgeDays[key] + ' delay timer' + (urgeDays[key] > 1 ? 's' : ''); }
+      if (key === today) cls.push('today');
+      if (key === selectedDay) cls.push('selected');
+      html += '<button type="button" class="' + cls.join(' ') + '"' + style + ' data-day="' + key + '" aria-label="' + esc(label) + '">' + inner + '</button>';
     }
     $('calGrid').innerHTML = html;
     $('lgLow').style.background = distressColor(1.5);
     $('lgMid').style.background = distressColor(5);
     $('lgHigh').style.background = distressColor(8.5);
   }
-
   $('calGrid').addEventListener('click', (e) => {
-    const b = e.target.closest('.cal-day[data-day]');
-    if (!b) return;
+    const b = e.target.closest('.cal-day[data-day]'); if (!b) return;
     selectedDay = selectedDay === b.dataset.day ? null : b.dataset.day;
     renderHistory();
   });
@@ -563,46 +1096,105 @@
   $('nextMonth').addEventListener('click', () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 1); renderCalendar(); });
   $('showAll').addEventListener('click', () => { selectedDay = null; renderHistory(); });
 
-  function entryHTML(e) {
-    const tags = (e.tags || []).map((t) => '<span class="pill">' + esc(t) + '</span>').join('');
-    return '<div class="entry">' +
-      '<div class="entry-top"><span class="entry-date">' + esc(prettyDate(e.date)) + '</span>' +
-      '<span class="badge" style="background:' + distressColor(e.distress) + '" title="Distress">' + e.distress + '/10</span></div>' +
-      (tags ? '<div class="pills">' + tags + '</div>' : '') +
-      (e.feeling ? '<p>' + esc(e.feeling) + '</p>' : '') +
-      (e.trigger ? '<p class="trigger">Trigger: ' + esc(e.trigger) + '</p>' : '') +
-      '<div class="actions"><button type="button" class="btn small" data-edit="' + e.id + '">Edit</button>' +
-      '<button type="button" class="btn small danger" data-del="' + e.id + '">Delete</button></div>' +
-      '</div>';
-  }
+  function pills(list, cls) { return (list || []).map((t) => '<span class="pill' + (cls ? ' ' + cls : '') + '">' + esc(t) + '</span>').join(''); }
 
+  function entryHTML(e) {
+    const p = pills(e.triggers, 'trig') + pills(e.tags);
+    return '<div class="entry"><div class="entry-top"><span><span class="kind">Log</span><span class="entry-date">' + esc(prettyDate(e.date)) + '</span></span>' +
+      '<span class="badge" style="background:' + distressColor(e.distress) + '">' + e.distress + '/10</span></div>' +
+      (isNum(e.after) ? '<p class="note">20–30 min later: ' + e.after + '/10</p>' : '') +
+      (p ? '<div class="pills">' + p + '</div>' : '') +
+      (e.feeling ? '<p>' + esc(e.feeling) + '</p>' : '') +
+      (e.trigger ? '<p class="note">Trigger: ' + esc(e.trigger) + '</p>' : '') +
+      '<div class="actions"><button type="button" class="btn small" data-edit="' + e.id + '">Edit</button>' +
+      '<button type="button" class="btn small danger" data-del="' + e.id + '">Delete</button></div></div>';
+  }
+  function urgeHTML(u) {
+    const ratings = [u.before + ' at start', isNum(u.endRating) ? u.endRating + ' when the timer ended' : null, isNum(u.after) ? u.after + ' later' : null].filter(Boolean).join(' → ');
+    return '<div class="entry"><div class="entry-top"><span><span class="kind">Delay timer · ' + clockTime(u.startedAt) + '</span><span class="entry-date">' + esc(prettyDate(u.date)) + '</span></span>' +
+      '<span class="badge" style="background:' + distressColor(u.before) + '">' + u.before + '/10</span></div>' +
+      '<p class="note">Waited ' + mmss(u.waitedSec) + ' of ' + u.plannedMin + ' min · ' + esc(OUTCOME_TEXT[u.outcome] || '') + '</p>' +
+      '<p class="note">Intensity: ' + ratings + '</p>' +
+      ((u.triggers || []).length ? '<div class="pills">' + pills(u.triggers, 'trig') + '</div>' : '') +
+      '<div class="actions"><button type="button" class="btn small danger" data-udel="' + u.id + '">Delete</button></div></div>';
+  }
   function renderHistory() {
     renderCalendar();
-    let list = sortedEntries();
-    if (selectedDay) list = list.filter((e) => e.date === selectedDay);
-    $('listTitle').textContent = selectedDay ? prettyDate(selectedDay) : 'All entries';
+    let items = state.entries.map((e) => ({ date: e.date, t: e.createdAt || 0, html: () => entryHTML(e) }))
+      .concat(state.urges.map((u) => ({ date: u.date, t: u.startedAt, html: () => urgeHTML(u) })));
+    if (selectedDay) items = items.filter((x) => x.date === selectedDay);
+    items.sort((a, b) => (a.date === b.date ? b.t - a.t : a.date < b.date ? 1 : -1));
+    $('listTitle').textContent = selectedDay ? prettyDate(selectedDay) : 'Everything';
     $('showAll').style.display = selectedDay ? 'inline-block' : 'none';
-    $('entryList').innerHTML = list.length
-      ? list.map(entryHTML).join('')
-      : '<div class="empty-msg">' + (selectedDay ? 'No entries on this day.' : 'No entries yet. Your first one will show up here.') + '</div>';
+    $('entryList').innerHTML = items.length ? items.map((x) => x.html()).join('')
+      : '<div class="empty-msg">' + (selectedDay ? 'Nothing logged on this day.' : 'Nothing logged yet.') + '</div>';
   }
-
   $('entryList').addEventListener('click', (e) => {
-    const ed = e.target.closest('[data-edit]');
-    const del = e.target.closest('[data-del]');
+    const ed = e.target.closest('[data-edit]'), del = e.target.closest('[data-del]'), ud = e.target.closest('[data-udel]');
     if (ed) startEdit(ed.dataset.edit);
-    if (del && confirm('Delete this entry? This can\'t be undone.')) {
+    if (del && confirm("Delete this entry? This can't be undone.")) {
       state.entries = state.entries.filter((x) => x.id !== del.dataset.del);
       if (editingId === del.dataset.del) resetForm();
-      save();
-      renderHistory();
-      toast('Entry deleted');
+      save(); renderHistory(); toast('Deleted');
+    }
+    if (ud && confirm("Delete this delay timer record? This can't be undone.")) {
+      state.urges = state.urges.filter((x) => x.id !== ud.dataset.udel);
+      save(); renderHistory(); toast('Deleted');
     }
   });
 
-  // ---------- Patterns ----------
-  // Patterns open once per calendar month. Once opened, they stay open for the
-  // rest of that day, then lock until the 1st of the next month.
+  // ================= Shared stats (used by Review and therapist summary) =================
+  function inRange(dateStr, fromKey) { return !fromKey || dateStr >= fromKey; }
+  function computeStats(fromKey) {
+    const E = state.entries.filter((e) => inRange(e.date, fromKey));
+    const U = state.urges.filter((u) => inRange(u.date, fromKey));
+    const pairs = E.filter((e) => isNum(e.after)).map((e) => [e.distress, e.after])
+      .concat(U.filter((u) => isNum(u.after)).map((u) => [u.before, u.after]));
+    const trig = {};
+    function addTrig(name, v) { const k = name.trim().toLowerCase(); if (!k) return; if (!trig[k]) trig[k] = { label: name.trim(), n: 0, v: [] }; trig[k].n++; trig[k].v.push(v); }
+    E.forEach((e) => { (e.triggers || []).forEach((t) => addTrig(t, e.distress)); if (e.trigger) addTrig(e.trigger, e.distress); });
+    U.forEach((u) => (u.triggers || []).forEach((t) => addTrig(t, u.before)));
+    const helped = {};
+    E.forEach((e) => (e.tags || []).forEach((t) => { helped[t] = true; }));
+    const helpedRows = Object.keys(helped).map((t) => {
+      const w = E.filter((e) => (e.tags || []).includes(t)).map((e) => e.distress);
+      const wo = E.filter((e) => !(e.tags || []).includes(t)).map((e) => e.distress);
+      return { tag: t, count: w.length, withAvg: avg(w), withoutAvg: avg(wo) };
+    }).sort((a, b) => b.count - a.count);
+    const fromTs = fromKey ? parseKey(fromKey).getTime() : 0;
+    return {
+      E, U, pairs, helpedRows,
+      trigRows: Object.values(trig).sort((a, b) => b.n - a.n),
+      urgeNo: U.filter((u) => u.outcome === 'no').length,
+      urgePartly: U.filter((u) => u.outcome === 'partly').length,
+      urgeYes: U.filter((u) => u.outcome === 'yes').length,
+      urgeAvgWait: avg(U.map((u) => u.waitedSec)),
+      urgeBefore: avg(U.map((u) => u.before)),
+      urgeEnd: avg(U.filter((u) => isNum(u.endRating)).map((u) => u.endRating)),
+      nameIt: state.nameIt.filter((t) => t >= fromTs).length,
+      pairBefore: avg(pairs.map((p) => p[0])),
+      pairAfter: avg(pairs.map((p) => p[1]))
+    };
+  }
+  function barRows(rows) {
+    return '<div class="bars">' + rows.map(([lbl, v]) =>
+      '<span>' + lbl + '</span><div class="bar"><div style="width:' + ((v || 0) * 10) + '%;background:' + distressColor(v || 0) + '"></div></div><span>' + fmt1(v) + '</span>').join('') + '</div>';
+  }
+  function ladderSummaryHTML() {
+    if (!state.ladder.length) return '';
+    const steps = state.ladder.slice().sort((a, b) => a.predicted - b.predicted);
+    const practised = steps.filter((s) => (s.practices || []).length);
+    return '<div class="card"><h2>Exposure ladder</h2><p class="note" style="margin-top:0">' +
+      steps.filter((s) => s.done).length + ' of ' + steps.length + ' steps mastered · ' +
+      steps.reduce((n, s) => n + (s.practices || []).length, 0) + ' practices logged</p>' +
+      practised.map((s) => {
+        const p = s.practices, f = p[0], l = p[p.length - 1];
+        return '<div class="tag-row"><div class="tag-row-top"><span class="tag-name">' + esc(s.text) + '</span><span class="tag-meta">' + p.length + '×</span></div>' +
+          '<div class="tag-meta">Start-of-practice intensity: first ' + f.before + ', latest ' + l.before + (s.done ? ' · mastered' : '') + '</div></div>';
+      }).join('') + '</div>';
+  }
+
+  // ================= Monthly review =================
   function reviewStatus() {
     const today = todayKey();
     const last = (state.review && state.review.lastOpened) || '';
@@ -612,201 +1204,244 @@
   }
   function nextMonthLabel() {
     const d = new Date();
-    return new Date(d.getFullYear(), d.getMonth() + 1, 1)
-      .toLocaleDateString(undefined, { day: 'numeric', month: 'long' });
+    return new Date(d.getFullYear(), d.getMonth() + 1, 1).toLocaleDateString(undefined, { day: 'numeric', month: 'long' });
   }
 
   function renderPatterns() {
     const body = $('patternsBody');
-    // Don't use up the monthly review before there's anything to see
-    if (state.entries.length < 3 && reviewStatus() !== 'open') {
+    const total = state.entries.length + state.urges.length;
+    if (total < 3 && reviewStatus() !== 'open') {
       body.innerHTML = '<div class="card"><h2>Monthly review</h2><p class="note" style="margin:0">Patterns start to show after a few entries. You have ' +
-        state.entries.length + ' so far. Keep logging, and your review will be here when there\'s enough to look at.</p></div>';
+        total + ' so far. Keep logging, and your review will be here when there\'s enough to look at.</p></div>';
       return;
     }
     const status = reviewStatus();
     if (status === 'locked') {
-      body.innerHTML = '<div class="card"><h2>Monthly review</h2><p class="note" style="margin:0">You\'ve had this month\'s review. ' +
-        'Your next one opens on <strong>' + esc(nextMonthLabel()) + '</strong>.</p>' +
-        '<p class="note">Until then, just keep logging. Looking at patterns less often gives them time to show and keeps the focus on living, not checking.</p></div>';
+      body.innerHTML = '<div class="card"><h2>Monthly review</h2><p class="note" style="margin:0">You\'ve had this month\'s review. Your next one opens on <strong>' +
+        esc(nextMonthLabel()) + '</strong>.</p><p class="note">Until then, just keep logging. Looking at patterns less often gives them time to show and keeps the focus on living, not checking.</p></div>';
       return;
     }
     if (status === 'ready') {
-      body.innerHTML = '<div class="card"><h2>Your monthly review is ready</h2><p class="note" style="margin-top:0">You can open patterns once a month. ' +
-        'Once opened, they stay available for the rest of today, then close until ' + esc(nextMonthLabel()) + '.</p>' +
-        '<p class="note">Pick a moment when you have a few calm minutes.</p>' +
-        '<button class="btn primary" id="openReview" type="button">Open this month\'s review</button></div>';
+      body.innerHTML = '<div class="card"><h2>Your monthly review is ready</h2><p class="note" style="margin-top:0">You can open patterns once a month. Once opened, they stay available for the rest of today, then close until ' +
+        esc(nextMonthLabel()) + '.</p><p class="note">Pick a moment when you have a few calm minutes.</p>' +
+        '<button class="btn primary block" id="openReview" type="button">Open this month\'s review</button></div>';
       $('openReview').addEventListener('click', () => {
         state.review = Object.assign({}, state.review, { lastOpened: todayKey() });
-        save();
-        renderPatterns();
+        save(); renderPatterns();
       });
       return;
     }
-    const entries = state.entries;
-    if (entries.length < 3) {
-      body.innerHTML = '<div class="card"><h2>Patterns</h2><p class="note" style="margin:0">Patterns start to show after a few entries. You have ' +
-        entries.length + ' so far. Keep logging and come back next month.</p></div>';
-      return;
-    }
 
-    // Last 30 days vs the 30 days before
-    const now = new Date(); now.setHours(0, 0, 0, 0);
-    const daysAgo = (k) => Math.round((now - parseKey(k)) / 86400000);
-    const last7 = entries.filter((e) => { const d = daysAgo(e.date); return d >= 0 && d < 30; }).map((e) => e.distress);
-    const prev7 = entries.filter((e) => { const d = daysAgo(e.date); return d >= 30 && d < 60; }).map((e) => e.distress);
-    const a7 = avg(last7), p7 = avg(prev7);
+    // Open: last 30 days, compared with the 30 before
+    const d30 = new Date(); d30.setDate(d30.getDate() - 29);
+    const d60 = new Date(); d60.setDate(d60.getDate() - 59);
+    const k30 = dateKey(d30), k60 = dateKey(d60);
+    const S = computeStats(k30);
+    const prevVals = state.entries.filter((e) => e.date >= k60 && e.date < k30).map((e) => e.distress)
+      .concat(state.urges.filter((u) => u.date >= k60 && u.date < k30).map((u) => u.before));
+    const curVals = S.E.map((e) => e.distress).concat(S.U.map((u) => u.before));
 
-    let html = '<div class="card"><h2>Overview</h2><p class="note" style="margin-top:0">Open until the end of today. Next review: ' + esc(nextMonthLabel()) + '.</p><div class="stats">' +
-      '<div class="stat"><div class="num">' + entries.length + '</div><div class="lbl">entries</div></div>' +
-      '<div class="stat"><div class="num">' + fmt1(a7) + '</div><div class="lbl">avg, last 30 days</div></div>' +
-      '<div class="stat"><div class="num">' + fmt1(p7) + '</div><div class="lbl">avg, 30 days before</div></div>' +
+    let html = '<div class="card"><h2>Last 30 days</h2><p class="note" style="margin-top:0">Open until the end of today. Next review: ' + esc(nextMonthLabel()) + '.</p>' +
+      '<div class="stats">' +
+      '<div class="stat"><div class="num">' + (S.E.length + S.U.length) + '</div><div class="lbl">things logged</div></div>' +
+      '<div class="stat"><div class="num">' + fmt1(avg(curVals)) + '</div><div class="lbl">avg intensity</div></div>' +
+      '<div class="stat"><div class="num">' + fmt1(avg(prevVals)) + '</div><div class="lbl">avg, 30 days before</div></div>' +
       '</div></div>';
 
-    // Per tag
-    const allTags = new Set();
-    entries.forEach((e) => (e.tags || []).forEach((t) => allTags.add(t)));
-    const rows = Array.from(allTags).map((t) => {
-      const withT = entries.filter((e) => (e.tags || []).includes(t)).map((e) => e.distress);
-      const without = entries.filter((e) => !(e.tags || []).includes(t)).map((e) => e.distress);
-      return { tag: t, count: withT.length, withAvg: avg(withT), withoutAvg: avg(without) };
-    }).sort((a, b) => b.count - a.count);
-
-    html += '<div class="card"><h2>What helped</h2>';
-    if (!rows.length) {
-      html += '<p class="note" style="margin:0">No "what helped" tags logged yet.</p>';
+    html += '<div class="card"><h2>Does it come down on its own?</h2>';
+    if (S.pairs.length) {
+      html += '<p class="note" style="margin-top:0">' + S.pairs.length + ' time' + (S.pairs.length > 1 ? 's' : '') + ' you rated it at the start and again 20–30 minutes later.</p>' +
+        barRows([['start', S.pairBefore], ['later', S.pairAfter]]);
+      const drop = S.pairBefore - S.pairAfter;
+      if (drop >= 0.5) html += '<p class="note">On average it came down by ' + fmt1(drop) + ' points.</p>';
     } else {
-      rows.forEach((r) => {
-        const diff = (r.withAvg !== null && r.withoutAvg !== null) ? r.withAvg - r.withoutAvg : null;
-        let diffText = '';
-        if (diff !== null && r.count >= 2) {
-          if (Math.abs(diff) < 0.5) diffText = 'about the same as other entries';
-          else diffText = fmt1(Math.abs(diff)) + (diff < 0 ? ' lower' : ' higher') + ' than entries without it';
-        }
-        html += '<div class="tag-row"><div class="tag-row-top"><span class="tag-name">' + esc(r.tag) + '</span>' +
-          '<span class="tag-meta">used ' + r.count + (r.count === 1 ? ' time' : ' times') + '</span></div>' +
-          '<div class="bars">' +
-            '<span>with</span><div class="bar"><div style="width:' + ((r.withAvg || 0) * 10) + '%;background:' + distressColor(r.withAvg || 0) + '"></div></div><span>' + fmt1(r.withAvg) + '</span>' +
-            '<span>without</span><div class="bar"><div style="width:' + ((r.withoutAvg || 0) * 10) + '%;background:' + distressColor(r.withoutAvg || 0) + '"></div></div><span>' + fmt1(r.withoutAvg) + '</span>' +
-          '</div>' +
-          (diffText ? '<div class="tag-meta" style="margin-top:4px">Average distress ' + diffText + '</div>' : '') +
-          '</div>';
-      });
-      html += '<p class="note">These show what tends to go together, not what causes what. Something you reach for on hard days can look "higher" simply because you use it when things are hard. How often you use it matters too.</p>';
+      html += '<p class="note" style="margin:0">Add a "20–30 minutes later" rating to see this.</p>';
     }
     html += '</div>';
 
-    // Triggers
-    const trig = {};
-    entries.forEach((e) => {
-      if (!e.trigger) return;
-      const k = e.trigger.trim().toLowerCase();
-      if (!trig[k]) trig[k] = { label: e.trigger.trim(), n: 0, d: [] };
-      trig[k].n++; trig[k].d.push(e.distress);
-    });
-    const trigRows = Object.values(trig).sort((a, b) => b.n - a.n).slice(0, 6);
-    if (trigRows.length) {
-      html += '<div class="card"><h2>Common triggers</h2>';
-      trigRows.forEach((t) => {
-        html += '<div class="tag-row"><div class="tag-row-top"><span class="tag-name">' + esc(t.label) + '</span>' +
-          '<span class="tag-meta">' + t.n + '× · avg ' + fmt1(avg(t.d)) + '</span></div></div>';
-      });
-      html += '</div>';
+    if (S.U.length) {
+      html += '<div class="card"><h2>Delay timer</h2><div class="stats">' +
+        '<div class="stat"><div class="num">' + S.U.length + '</div><div class="lbl">urges waited out</div></div>' +
+        '<div class="stat"><div class="num">' + S.urgeNo + '</div><div class="lbl">without the compulsion</div></div>' +
+        '<div class="stat"><div class="num">' + mmss(S.urgeAvgWait) + '</div><div class="lbl">avg wait</div></div></div>' +
+        '<h3>Urge strength</h3>' + barRows([['start', S.urgeBefore], ['timer end', S.urgeEnd]]) +
+        (S.urgePartly ? '<p class="note">Partly did it: ' + S.urgePartly + ' time' + (S.urgePartly > 1 ? 's' : '') + '.</p>' : '') + '</div>';
     }
 
+    if (S.nameIt) html += '<div class="card"><h2>Name it</h2><p class="note" style="margin:0">You named an OCD thought ' + S.nameIt + ' time' + (S.nameIt > 1 ? 's' : '') + ' this month.</p></div>';
+
+    if (S.trigRows.length) {
+      html += '<div class="card"><h2>Triggers</h2>' + S.trigRows.slice(0, 8).map((t) =>
+        '<div class="tag-row"><div class="tag-row-top"><span class="tag-name">' + esc(t.label) + '</span><span class="tag-meta">' + t.n + '× · avg ' + fmt1(avg(t.v)) + '</span></div></div>').join('') + '</div>';
+    }
+
+    html += '<div class="card"><h2>What helped</h2>';
+    if (!S.helpedRows.length) html += '<p class="note" style="margin:0">No "what helped" tags logged this month.</p>';
+    else {
+      S.helpedRows.forEach((r) => {
+        const diff = r.withAvg !== null && r.withoutAvg !== null ? r.withAvg - r.withoutAvg : null;
+        let txt = '';
+        if (diff !== null && r.count >= 2) txt = Math.abs(diff) < 0.5 ? 'about the same as other entries' : fmt1(Math.abs(diff)) + (diff < 0 ? ' lower' : ' higher') + ' than entries without it';
+        html += '<div class="tag-row"><div class="tag-row-top"><span class="tag-name">' + esc(r.tag) + '</span><span class="tag-meta">used ' + r.count + (r.count === 1 ? ' time' : ' times') + '</span></div>' +
+          barRows([['with', r.withAvg], ['without', r.withoutAvg]]) +
+          (txt ? '<div class="tag-meta" style="margin-top:4px">Average intensity ' + txt + '</div>' : '') + '</div>';
+      });
+      html += '<p class="note">These show what tends to go together, not what causes what. Something you reach for on hard days can look "higher" simply because you use it when things are hard.</p>';
+    }
+    html += '</div>';
+    html += ladderSummaryHTML();
     body.innerHTML = html;
   }
 
-  // ---------- Settings ----------
-  function renderTagManage() {
-    $('tagManage').innerHTML = state.tags.length
-      ? state.tags.map((t, i) =>
-          '<div class="tag-manage"><span>' + esc(t) + '</span><button type="button" class="btn small danger" data-rm="' + i + '">Remove</button></div>'
-        ).join('')
-      : '<p class="note" style="margin:0">No tags. Add some from the Log screen.</p>';
+  // ================= Therapist summary =================
+  $('openSummary').addEventListener('click', () => show('summary'));
+  $('closeSummary').addEventListener('click', () => show('settings'));
+  $('sumPeriod').addEventListener('change', renderSummary);
+  $('printSummary').addEventListener('click', () => window.print());
+
+  function renderSummary() {
+    const p = $('sumPeriod').value;
+    let fromKey = null;
+    if (p !== 'all') { const d = new Date(); d.setDate(d.getDate() - (Number(p) - 1)); fromKey = dateKey(d); }
+    const S = computeStats(fromKey);
+    const allDates = S.E.map((e) => e.date).concat(S.U.map((u) => u.date)).sort();
+    const startLbl = fromKey ? prettyDate(fromKey) : (allDates[0] ? prettyDate(allDates[0]) : '–');
+
+    let h = '<div class="card"><h2 style="font-size:1.25rem">OCD tracking summary</h2>' +
+      '<p class="note" style="margin:0">' + esc(startLbl) + ' to ' + esc(prettyDate(todayKey())) + ' · created ' + esc(new Date().toLocaleDateString()) + '</p>' +
+      '<p class="note">Self-recorded in Spiral Log. Intensity is rated 0 (calm) to 10 (overwhelming).</p>' +
+      '<div class="stats">' +
+      '<div class="stat"><div class="num">' + S.E.length + '</div><div class="lbl">log entries</div></div>' +
+      '<div class="stat"><div class="num">' + S.U.length + '</div><div class="lbl">delay timers</div></div>' +
+      '<div class="stat"><div class="num">' + fmt1(avg(S.E.map((e) => e.distress))) + '</div><div class="lbl">avg peak intensity</div></div>' +
+      '</div></div>';
+
+    h += '<div class="card"><h2>Start vs 20–30 minutes later</h2>' + (S.pairs.length
+      ? '<p class="note" style="margin-top:0">' + S.pairs.length + ' paired ratings. Average ' + fmt1(S.pairBefore) + ' at the start, ' + fmt1(S.pairAfter) + ' later.</p>' + barRows([['start', S.pairBefore], ['later', S.pairAfter]])
+      : '<p class="note" style="margin:0">No paired ratings in this period.</p>') + '</div>';
+
+    if (S.U.length) {
+      h += '<div class="card"><h2>Response prevention (delay timer)</h2><p class="note" style="margin-top:0">' +
+        S.U.length + (S.U.length === 1 ? ' urge' : ' urges') + ' delayed. Afterwards: did not do the compulsion ' + S.urgeNo + ', partly ' + S.urgePartly + ', did it ' + S.urgeYes + '. ' +
+        'Average wait ' + mmss(S.urgeAvgWait) + '. Urge strength averaged ' + fmt1(S.urgeBefore) + ' at the start and ' + fmt1(S.urgeEnd) + ' when the timer ended.</p></div>';
+    }
+    if (S.nameIt) h += '<div class="card"><h2>Name it</h2><p class="note" style="margin:0">Labelled a thought as OCD ' + S.nameIt + (S.nameIt === 1 ? ' time.' : ' times.') + '</p></div>';
+
+    if (S.trigRows.length) {
+      h += '<div class="card"><h2>Triggers</h2><table class="sum"><tr><th>Trigger</th><th>Times</th><th>Avg intensity</th></tr>' +
+        S.trigRows.map((t) => '<tr><td>' + esc(t.label) + '</td><td>' + t.n + '</td><td>' + fmt1(avg(t.v)) + '</td></tr>').join('') + '</table></div>';
+    }
+    if (S.helpedRows.length) {
+      h += '<div class="card"><h2>What helped</h2><table class="sum"><tr><th>Strategy</th><th>Times</th><th>Avg with</th><th>Avg without</th></tr>' +
+        S.helpedRows.map((r) => '<tr><td>' + esc(r.tag) + '</td><td>' + r.count + '</td><td>' + fmt1(r.withAvg) + '</td><td>' + fmt1(r.withoutAvg) + '</td></tr>').join('') + '</table></div>';
+    }
+    if (state.ladder.length) {
+      const steps = state.ladder.slice().sort((a, b) => a.predicted - b.predicted);
+      h += '<div class="card"><h2>Exposure ladder</h2><table class="sum"><tr><th>Step</th><th>Expected</th><th>Practices</th><th>First</th><th>Latest</th><th>Mastered</th></tr>' +
+        steps.map((s) => { const pr = s.practices || [], f = pr[0], l = pr[pr.length - 1];
+          return '<tr><td>' + esc(s.text) + '</td><td>' + s.predicted + '</td><td>' + pr.length + '</td><td>' + (f ? f.before + '→' + f.after : '–') + '</td><td>' + (l ? l.before + '→' + l.after : '–') + '</td><td>' + (s.done ? 'Yes' : '') + '</td></tr>'; }).join('') +
+        '</table><p class="note">Practice ratings are start→end intensity.</p></div>';
+    }
+    if (S.E.length) {
+      const rows = S.E.slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+      h += '<div class="card"><h2>Log entries</h2><div class="sum-wrap"><table class="sum"><tr><th>Date</th><th>Peak</th><th>Later</th><th>Triggers</th><th>Helped</th><th>Mood</th></tr>' +
+        rows.map((e) => '<tr><td>' + esc(shortDate(e.date)) + '</td><td>' + e.distress + '</td><td>' + (isNum(e.after) ? e.after : '–') + '</td><td>' +
+          esc((e.triggers || []).concat(e.trigger ? [e.trigger] : []).join(', ')) + '</td><td>' + esc((e.tags || []).join(', ')) + '</td><td>' + esc(e.feeling || '') + '</td></tr>').join('') +
+        '</table></div></div>';
+    }
+    if (S.U.length) {
+      const rows = S.U.slice().sort((a, b) => b.startedAt - a.startedAt);
+      h += '<div class="card"><h2>Delay timers</h2><div class="sum-wrap"><table class="sum"><tr><th>When</th><th>Waited</th><th>Start</th><th>End</th><th>Later</th><th>Outcome</th><th>Triggers</th></tr>' +
+        rows.map((u) => '<tr><td>' + esc(shortDate(u.date)) + ' ' + clockTime(u.startedAt) + '</td><td>' + mmss(u.waitedSec) + '/' + u.plannedMin + 'm</td><td>' + u.before + '</td><td>' +
+          (isNum(u.endRating) ? u.endRating : '–') + '</td><td>' + (isNum(u.after) ? u.after : '–') + '</td><td>' + esc(OUTCOME_TEXT[u.outcome] || '') + '</td><td>' + esc((u.triggers || []).join(', ')) + '</td></tr>').join('') +
+        '</table></div></div>';
+    }
+    $('summaryBody').innerHTML = h;
   }
-  $('tagManage').addEventListener('click', (e) => {
-    const b = e.target.closest('[data-rm]');
-    if (!b) return;
-    const t = state.tags[Number(b.dataset.rm)];
-    state.tags.splice(Number(b.dataset.rm), 1);
-    selectedTags.delete(t);
-    save();
-    renderTagManage();
-    renderTagChips();
+
+  // ================= Settings =================
+  function manageList(containerId, key, emptyMsg) {
+    $(containerId).innerHTML = state[key].length
+      ? state[key].map((t, i) => '<div class="tag-manage"><span>' + esc(t) + '</span><button type="button" class="btn small danger" data-rm="' + key + ':' + i + '">Remove</button></div>').join('')
+      : '<p class="note" style="margin:0">' + emptyMsg + '</p>';
+  }
+  function renderSettings() {
+    manageList('trigManage', 'triggerTags', 'No trigger tags. Add some from the Log screen.');
+    manageList('tagManage', 'tags', 'No tags. Add some from the Log screen.');
+  }
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-rm]'); if (!b) return;
+    const [key, i] = b.dataset.rm.split(':');
+    state[key].splice(Number(i), 1);
+    save(); renderSettings(); helpedChips.render(); trigChips.render(); timerTrigChips.render();
   });
 
   $('exportBtn').addEventListener('click', () => {
-    const payload = { app: 'spiral-log', version: 1, exportedAt: new Date().toISOString(), entries: state.entries, tags: state.tags };
+    const payload = Object.assign({ app: 'spiral-log', version: 2, exportedAt: new Date().toISOString() }, state, { activeTimer: null });
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = 'spiral-log-backup-' + todayKey() + '.json';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+    a.href = url; a.download = 'spiral-log-backup-' + todayKey() + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     toast('Backup downloaded');
   });
 
   $('importBtn').addEventListener('click', () => $('importFile').click());
   $('importFile').addEventListener('change', (ev) => {
-    const file = ev.target.files && ev.target.files[0];
-    if (!file) return;
+    const file = ev.target.files && ev.target.files[0]; if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
       try {
         const d = JSON.parse(reader.result);
-        const incoming = Array.isArray(d.entries) ? d.entries : [];
-        const valid = incoming.filter((e) => e && /^\d{4}-\d{2}-\d{2}$/.test(e.date) && typeof e.distress === 'number');
-        const have = new Set(state.entries.map((e) => e.id));
         let added = 0;
-        valid.forEach((e) => {
-          const clean = {
-            id: e.id && !have.has(e.id) ? String(e.id) : uid(),
-            createdAt: Number(e.createdAt) || Date.now(),
-            date: e.date,
-            distress: Math.max(0, Math.min(10, Math.round(e.distress))),
-            feeling: typeof e.feeling === 'string' ? e.feeling : '',
-            tags: Array.isArray(e.tags) ? e.tags.filter((t) => typeof t === 'string') : [],
-            trigger: typeof e.trigger === 'string' ? e.trigger : ''
-          };
-          if (e.id && have.has(e.id)) return; // already have it
-          state.entries.push(clean);
-          have.add(clean.id);
-          added++;
-        });
-        if (Array.isArray(d.tags)) {
-          d.tags.forEach((t) => {
-            if (typeof t === 'string' && !state.tags.some((x) => x.toLowerCase() === t.toLowerCase())) state.tags.push(t);
+        function mergeById(key, valid) {
+          const have = new Set(state[key].map((x) => x.id));
+          (Array.isArray(d[key]) ? d[key] : []).forEach((x) => {
+            if (!x || !valid(x) || (x.id && have.has(x.id))) return;
+            const copy = Object.assign({}, x, { id: x.id ? String(x.id) : uid() });
+            state[key].push(copy); have.add(copy.id); added++;
           });
         }
-        save();
-        renderTagManage();
-        renderTagChips();
-        toast(added ? 'Imported ' + added + (added === 1 ? ' entry' : ' entries') : 'Nothing new to import');
-      } catch (err) {
-        toast('That file couldn\'t be read');
-      }
+        mergeById('entries', (e) => /^\d{4}-\d{2}-\d{2}$/.test(e.date) && isNum(e.distress));
+        mergeById('urges', (u) => /^\d{4}-\d{2}-\d{2}$/.test(u.date) && isNum(u.before));
+        mergeById('ladder', (s) => typeof s.text === 'string' && isNum(s.predicted));
+        if (Array.isArray(d.nameIt)) { const have = new Set(state.nameIt); d.nameIt.forEach((t) => { if (isNum(t) && !have.has(t)) state.nameIt.push(t); }); }
+        ['tags', 'triggerTags'].forEach((key) => {
+          if (Array.isArray(d[key])) d[key].forEach((t) => {
+            if (typeof t === 'string' && !state[key].some((x) => x.toLowerCase() === t.toLowerCase())) state[key].push(t);
+          });
+        });
+        save(); renderSettings(); helpedChips.render(); trigChips.render(); timerTrigChips.render();
+        toast(added ? 'Imported ' + added + ' item' + (added === 1 ? '' : 's') : 'Nothing new to import');
+      } catch (err) { toast("That file couldn't be read"); }
       ev.target.value = '';
     };
     reader.readAsText(file);
   });
 
   $('wipeBtn').addEventListener('click', () => {
-    if (!confirm('Delete ALL entries from this device? This can\'t be undone.')) return;
-    state = { entries: [], tags: DEFAULT_TAGS.slice(), review: state.review || {} };
-    save();
-    resetForm();
-    renderTagManage();
+    if (!confirm("Delete ALL entries, timers and ladder steps from this device? This can't be undone.")) return;
+    const review = state.review;
+    state = blankState(); state.review = review;
+    save(); resetForm(); renderSettings(); renderTimer(); renderFollowUps(true);
     toast('All data deleted');
   });
 
-  // ---------- Start ----------
+  // ================= Start =================
   resetForm();
+  timerTrigChips.render();
+  renderTimer();
+  renderFollowUps(true);
 
-  // Offline support once hosted (e.g. GitHub Pages). Skipped when opened as a local file.
+  setInterval(() => {
+    if (state.activeTimer) renderTimer();
+    if (currentView === 'now' || currentView === 'log') renderFollowUps(false);
+  }, 500);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) { renderTimer(); renderFollowUps(true); }
+  });
+
   if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
